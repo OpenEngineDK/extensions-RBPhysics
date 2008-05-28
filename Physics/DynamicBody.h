@@ -33,7 +33,6 @@ namespace OpenEngine {
       /**
        * Set the position of the rigid body.
        * This change is propagated to the physics engine.
-       * This will cause a reinsertion of the rigid body.
        *
        * @param pos The new position of the rigid body
        */
@@ -42,7 +41,6 @@ namespace OpenEngine {
       /**
        * Set the rotation of the rigid body.
        * This change is propagated to the physics engine.
-       * This will cause a reinsertion of the rigid body.
        *
        * @param rot The new rotation of the rigid body
        */
@@ -161,7 +159,6 @@ namespace OpenEngine {
        * Set the damping of the linear velocity
        * of the rigid body.
        * This change is propagated to the physics engine.
-       * This will cause a reinsertion of the rigid body.
        * This method is intended to be used before the
        * object is inserted in the physics engine.
        *
@@ -172,7 +169,6 @@ namespace OpenEngine {
        * Set the damping of the angular velocity
        * of the rigid body.
        * This change is propagated to the physics engine.
-       * This will cause a reinsertion of the rigid body.
        * This method is intended to be used before the
        * object is inserted in the physics engine.
        *

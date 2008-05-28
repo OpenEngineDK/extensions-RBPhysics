@@ -7,6 +7,8 @@
 #include <Geometry/AABB.h>
 #include <Geometry/Sphere.h>
 #include <Geometry/TriangleMesh.h>
+#include <Geometry/CompoundShape.h>
+#include <Geometry/HeightfieldTerrainShape.h>
 #include <Core/Exceptions.h>
 #include <Logging/Logger.h>
 #include "../Physics/RigidBody.h"
@@ -38,7 +40,10 @@ namespace OpenEngine
 
       m_solver = new btSequentialImpulseConstraintSolver();
 
-      btDiscreteDynamicsWorld* world = new btDiscreteDynamicsWorld(m_dispatcher,m_broadphase,m_solver,m_collisionConfiguration);
+      btDiscreteDynamicsWorld* world = new btDiscreteDynamicsWorld(m_dispatcher,
+								   m_broadphase,
+								   m_solver,
+								   m_collisionConfiguration);
       m_dynamicsWorld = world;
 
       m_dynamicsWorld->setGravity(btVector3(0,-100,0));
@@ -80,8 +85,8 @@ namespace OpenEngine
             btBody.setAngularVelocity(toBtVec(dynBody.GetAngularVelocity()));
             
             // reinsert in physics world:
-//             m_dynamicsWorld->removeRigidBody((*it).get<1>());
-//             m_dynamicsWorld->addRigidBody((*it).get<1>());
+	    //             m_dynamicsWorld->removeRigidBody((*it).get<1>());
+	    //             m_dynamicsWorld->addRigidBody((*it).get<1>());
           }
 
           // apply forces:
@@ -176,6 +181,9 @@ namespace OpenEngine
       else if(typeid(TriangleMesh) == typeid(*body->GetShape())) {
 	shape = CreateMesh(body);
       }
+      else if(typeid(CompoundShape) == typeid(*body->GetShape())) {
+	shape = ConvertShape(body->GetShape());
+      }
       else {
 	throw NotImplemented();
       }
@@ -192,25 +200,66 @@ namespace OpenEngine
 
         bodies.push_back(BodyPair(body,btBody));
       }
+      else if(typeid(Car) == typeid(*body) ) {
+	DynamicBody * chassis = (dynamic_cast<Car*>(body))->GetChassis();
+
+        btRigidBody* btBody = localCreateRigidBody(chassis->GetMass(),trans,shape);
+        btBody->setLinearVelocity(toBtVec(chassis->GetLinearVelocity()));
+        btBody->setAngularVelocity(toBtVec(chassis->GetAngularVelocity()));
+
+	btRaycastVehicle::btVehicleTuning* tuning =
+	  new btRaycastVehicle::btVehicleTuning();
+
+	btVehicleRaycaster* raycaster =
+	  new btDefaultVehicleRaycaster(m_dynamicsWorld);
+
+	btRaycastVehicle* vehicle = new btRaycastVehicle(*tuning,btBody,raycaster);
+
+	cars.push_back(CarPair(dynamic_cast<Car*>(body),vehicle));
+
+	m_dynamicsWorld->addVehicle(vehicle);
+      }
       else {
         btRigidBody* btBody = localCreateRigidBody(0.0f,trans,shape);
 
-//         btBody->setCollisionFlags( btBody->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
-//         btBody->setActivationState(DISABLE_DEACTIVATION);
+	//         btBody->setCollisionFlags( btBody->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
+	//         btBody->setActivationState(DISABLE_DEACTIVATION);
 
         bodies.push_back(BodyPair(body,btBody));
       }
     }    
 
     struct FindBtBody {
+
       FindBtBody(OpenEngine::Physics::IRigidBody * body) : body(body) {}
-      bool operator() (const tuple<IRigidBody*,btRigidBody*> & pair) {return pair.get<0>() == body;}
+
+      bool operator() (const tuple<IRigidBody*,btRigidBody*> & pair) {
+	return pair.get<0>() == body;
+      }
+
       OpenEngine::Physics::IRigidBody * body;
     };
+
     struct FindOEBody {
+
       FindOEBody(btRigidBody * body) : body(body) {}
-      bool operator() (const tuple<IRigidBody*,btRigidBody*> & pair) {return pair.get<1>() == body;}
+
+      bool operator() (const tuple<IRigidBody*,btRigidBody*> & pair) {
+	return pair.get<1>() == body;
+      }
+
       btRigidBody * body;
+    };
+
+    struct FindBtVehicle {
+
+      FindBtVehicle(OpenEngine::Physics::Car * car) : car(car) {}
+
+      bool operator() (const tuple<Car*,btRaycastVehicle*> & pair) {
+	return pair.get<0>() == car;
+      }
+
+      OpenEngine::Physics::Car * car;
     };
 
     void BulletEngine::RemoveRigidBody(OpenEngine::Physics::IRigidBody * body) 
@@ -222,6 +271,17 @@ namespace OpenEngine
         bodies.remove_if(pred);
         m_dynamicsWorld->removeRigidBody(pair.get<1>());
         delete pair.get<1>();
+      }
+
+      if(typeid(*body)==typeid(Car)) {
+	FindBtVehicle pred2(dynamic_cast<Car*>(body));
+	list< CarPair >::iterator it = find_if(cars.begin(),cars.end(),pred2);
+	if(it != cars.end()) {
+	  CarPair& pair = *it;
+	  cars.remove_if(pred2);
+	  m_dynamicsWorld->removeVehicle(pair.get<1>());
+	  delete pair.get<1>();
+	}
       }
     }
 
@@ -280,39 +340,59 @@ namespace OpenEngine
       return body;
     }
 
-    /*
-      void BulletEngine::AddStaticGeometry(StaticGeometry * geometry)
-      {
-      // make new triangle mesh
-      btTriangleMesh triMesh = btTriangleMesh();
-      FaceSet* faces = geometry->GetFaceSet();
-      // fill triangle mesh with faces from the static geometry
-      for(FaceList::iterator it = faces->begin(); it != faces->end(); it++) {
-      FacePtr tmp = (FacePtr)*it;
-      triMesh.addTriangle(toBtVec(tmp->vert[0]), toBtVec(tmp->vert[1]), toBtVec(tmp->vert[2]));
+    btCollisionShape * BulletEngine::ConvertShape(OpenEngine::Geometry::Geometry * geom)
+    {
+      
+      if(typeid(Sphere) == typeid(*geom)) {
+	Sphere * sphere = dynamic_cast<Sphere* >(geom);
+	
+	return new btSphereShape(sphere->GetRadius());
       }
-      // make a new triangle mesh shape
-      btBvhTriangleMeshShape * tms = new btBvhTriangleMeshShape(&triMesh, false);
+      // case Box
+      else if(typeid(AABB) == typeid(*geom)) {
+	AABB * box = dynamic_cast<AABB* >(geom);
+	
+	Vector<3,float> size = box->GetCorner();
 
-      btVector3 pos;
-      pos.setValue(0.0, 0.0, 0.0);
+	return new btBoxShape (toBtVec(size));
+      }
+      else if(typeid(TriangleMesh) == typeid(*geom)) {
+	TriangleMesh * triangleMesh = dynamic_cast<TriangleMesh* >(geom);
+	FaceSet * faces = triangleMesh->GetFaceSet();
+	btTriangleMesh * triMesh = new btTriangleMesh();
+	// fill triangle mesh with faces from the static geometry
+	for(FaceList::iterator it = faces->begin(); it != faces->end(); it++) {
+	  FacePtr tmp = (FacePtr)*it;
+	  triMesh->addTriangle(toBtVec(tmp->vert[0]), toBtVec(tmp->vert[1]), toBtVec(tmp->vert[2]));
+	}
+	//cout << "NumTriangles in triangleMesh: " << triMesh.getNumTriangles() << std::endl;
+	// make a new triangle mesh shape
+	bool useQuantizedBvhTree = true;
+	btCollisionShape* shape = NULL;
+	shape = new btBvhTriangleMeshShape(triMesh, useQuantizedBvhTree);
+	((btBvhTriangleMeshShape*)shape)->recalcLocalAabb(); // do we need to do this?
+	return shape;
+      }
+      else if(typeid(CompoundShape) == typeid(*geom)) {
+	CompoundShape * compound = dynamic_cast<CompoundShape*>(geom);
+	btCompoundShape * cShape = new btCompoundShape();
+	for(int i = 0; i < compound->getNumChildShapes(); i++) {	  
+	  OpenEngine::Geometry::Geometry * shape = compound->getChildShape(i);
+	  TransformationNode * tn = compound->getChildTransform(i);
+	  btCollisionShape * collShape = ConvertShape(shape);
+	  btTransform * btTrans = new btTransform(toBtQuat(tn->GetRotation()), toBtVec(tn->GetPosition()));
+	  cShape->addChildShape(*btTrans, collShape);
+	}
+	return cShape;
+      }
+      else if(typeid(HeightfieldTerrainShape) == typeid(*geom)) {
 
-      btQuaternion rot = btQuaternion(1.0, 1.0, 1.0, 1.0);
 
-      btTransform trans;
-      trans.setIdentity();
-      trans.setOrigin(pos);
-      trans.setRotation(rot);
-
-
-      btRigidBody* btBody = localCreateRigidBody(0.0, trans, tms);
-
-      btBody->setCollisionFlags( btBody->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
-      btBody->setActivationState(DISABLE_DEACTIVATION);
-
-      //bodies.push_back(BodyPair(body,btBody));
 
       }
-    */
+      return NULL;
+    }
+
+
   }
 }

@@ -7,7 +7,9 @@
 #include <Geometry/AABB.h>
 #include <Math/Vector.h>
 #include <list>
+#include <Geometry/Geometry.h>
 #include <boost/tuple/tuple.hpp>
+#include "../Physics/Car.h"
 
 namespace OpenEngine 
 {
@@ -42,19 +44,27 @@ namespace OpenEngine
                        const OpenEngine::Math::Vector<3,float> & end,
                        OpenEngine::Physics::IRayResultCallback * callback);
 
-          OpenEngine::Renderers::IRenderNode * getRenderNode(OpenEngine::Renderers::IRenderer * renderer);
+          OpenEngine::Renderers::IRenderNode *
+	    getRenderNode(OpenEngine::Renderers::IRenderer * renderer);
 
           typedef boost::tuple<OpenEngine::Physics::IRigidBody*,btRigidBody*> BodyPair;
+          typedef boost::tuple<OpenEngine::Physics::Car*,btRaycastVehicle*> CarPair;
+
         private:
 
-
           std::list< BodyPair > bodies;
+          std::list< CarPair > cars;
   
-          btRigidBody* localCreateRigidBody(float mass, const btTransform& startTransform,btCollisionShape* shape);
+          btRigidBody* localCreateRigidBody(float mass,
+					    const btTransform& startTransform,
+					    btCollisionShape* shape);
+
+	  btCollisionShape* ConvertShape(OpenEngine::Geometry::Geometry * geom);
 
 	  btCollisionShape* CreateBox(OpenEngine::Physics::IRigidBody * body);
 	  btCollisionShape* CreateSphere(OpenEngine::Physics::IRigidBody * body);
 	  btCollisionShape* CreateMesh(OpenEngine::Physics::IRigidBody * body);
+
 
           ///this is the most important class
           btDynamicsWorld*    m_dynamicsWorld;

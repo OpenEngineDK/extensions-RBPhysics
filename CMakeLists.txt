@@ -16,6 +16,8 @@ ADD_LIBRARY(Extensions_RBPhysics
   Bullet/Util.cpp
   Bullet/BulletRayResultCallback.cpp
   Geometry/TriangleMesh.cpp
+  Geometry/CompoundShape.cpp
+  Geometry/HeightfieldTerrainShape.cpp
   Geometry/AABB.cpp
 )
 

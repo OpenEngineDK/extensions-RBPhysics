@@ -38,6 +38,13 @@ namespace OpenEngine {
        */
       OpenEngine::Math::Vector<3,float> GetAngularVelocity() const;
 
+      /**
+       * Set the linear velocity of the car.
+       * This only affects the physics calculations if it is
+       * set before the car is added to the physics engine.
+       *
+       * @param vel The linear velocity of the car
+       */
       void SetLinearVelocity(OpenEngine::Math::Vector<3,float>);
       /**
        * Set the angular velocity of the car.
@@ -51,6 +58,8 @@ namespace OpenEngine {
       void Accelerate(float accel);
       void Brake(float brake);
       void Turn(float turn);
+
+      DynamicBody * GetChassis();
     };
 
   }

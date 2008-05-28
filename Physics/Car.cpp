@@ -12,7 +12,7 @@ namespace OpenEngine {
   namespace Physics {
     
     Car::Car(DynamicBody * chassis)  :
-      RigidBodyDecorator(body) {
+      RigidBodyDecorator(chassis) {
 
     }
 
@@ -32,5 +32,22 @@ namespace OpenEngine {
     void Car::SetAngularVelocity(Vector<3,float> vel) {
       dynamic_cast<DynamicBody*>(body)->SetAngularVelocity(vel);
     }
+
+    void Car::Accelerate(float accel) {
+
+    }
+
+    void Car::Brake(float brake) {
+
+    }
+
+    void Car::Turn(float turn) {
+
+    }
+
+    DynamicBody * Car::GetChassis() {
+      return dynamic_cast<DynamicBody*>(body);
+    }
+
   }
 }
