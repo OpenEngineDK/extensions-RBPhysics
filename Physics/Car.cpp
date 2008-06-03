@@ -33,16 +33,24 @@ namespace OpenEngine {
       dynamic_cast<DynamicBody*>(body)->SetAngularVelocity(vel);
     }
 
-    void Car::Accelerate(float accel) {
-
+    float Car::GetEngineForce() {
+      return force;
+    }
+    float Car::GetBrake() {
+      return brake;
+    }
+    float Car::GetTurn() {
+      return turn;
     }
 
-    void Car::Brake(float brake) {
-
+    void Car::SetEngineForce(float force) {
+      this->force = force;
     }
-
-    void Car::Turn(float turn) {
-
+    void Car::SetBrake(float brake) {
+      this->brake = brake;
+    }
+    void Car::SetTurn(float turn) {
+      this->turn = turn;
     }
 
     DynamicBody * Car::GetChassis() {

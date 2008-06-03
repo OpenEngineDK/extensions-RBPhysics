@@ -7,9 +7,9 @@ namespace OpenEngine {
 
   namespace Physics {
 
-    PhysicsFacade::PhysicsFacade(OpenEngine::Geometry::AABB & worldAabb) 
+    PhysicsFacade::PhysicsFacade(OpenEngine::Geometry::AABB & worldAabb, Vector<3,float> gravity) 
     {
-      physEngine =  new Bullet::BulletEngine(worldAabb);
+      physEngine =  new Bullet::BulletEngine(worldAabb,gravity);
       physEngine->Initialize();
     }
 

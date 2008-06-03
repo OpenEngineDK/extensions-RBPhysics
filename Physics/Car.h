@@ -55,11 +55,22 @@ namespace OpenEngine {
        */
       void SetAngularVelocity(OpenEngine::Math::Vector<3,float> vel);
 
-      void Accelerate(float accel);
-      void Brake(float brake);
-      void Turn(float turn);
+      float GetEngineForce();
+      float GetBrake();
+      float GetTurn();
+
+      void SetEngineForce(float force);
+      void SetBrake(float brake);
+      void SetTurn(float turn);
 
       DynamicBody * GetChassis();
+
+    private:
+
+      float force;
+      float brake;
+      float turn;
+
     };
 
   }

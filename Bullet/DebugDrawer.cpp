@@ -5,6 +5,7 @@
 
 #include "Util.h"
 #include <Geometry/Line.h>
+#include <Geometry/Face.h>
 #include <Logging/Logger.h>
 using namespace OpenEngine::Geometry;
 using namespace OpenEngine::Logging;
@@ -16,50 +17,56 @@ DebugDrawer::DebugDrawer(OpenEngine::Renderers::IRenderer * renderer)
 {
 
 }
-void	DebugDrawer::drawLine(const btVector3& from,const btVector3& to,const btVector3& color)
+inline void	DebugDrawer::drawLine(const btVector3& from,const btVector3& to,const btVector3& color)
 {
     renderer->DrawLine(Line(toOEVec(from),toOEVec(to)),toOEVec(color));
 }
 
-void	DebugDrawer::setDebugMode(int debugMode)
+void DebugDrawer::drawTriangle(const btVector3& v0,const btVector3& v1,const btVector3& v2,
+                          const btVector3& n0,const btVector3& n1,const btVector3& n2,
+                          const btVector3& color, btScalar alpha) 
+{
+  p0 = toOEVec(v0);
+  p1 = toOEVec(v1);
+  p2 = toOEVec(v2);
+  c = toOEVec(color);
+  renderer->DrawLine(Line(p0,p1),c);
+  renderer->DrawLine(Line(p1,p2),c);
+  renderer->DrawLine(Line(p2,p0),c);
+}
+
+inline void DebugDrawer::drawTriangle(const btVector3& v0,const btVector3& v1,const btVector3& v2,const btVector3& color, btScalar alpha) 
+{
+  p0 = toOEVec(v0);
+  p1 = toOEVec(v1);
+  p2 = toOEVec(v2);
+  c = toOEVec(color);
+  renderer->DrawLine(Line(p0,p1),c);
+  renderer->DrawLine(Line(p1,p2),c);
+  renderer->DrawLine(Line(p2,p0),c);
+}
+
+
+inline void	DebugDrawer::setDebugMode(int debugMode)
 {
   m_debugMode = debugMode;
 }
 
-void	DebugDrawer::draw3dText(const btVector3& location,const char* textString)
+inline void	DebugDrawer::draw3dText(const btVector3& location,const char* textString)
 {
-// 	glRasterPos3f(location.x(),  location.y(),  location.z());
-// 	BMF_DrawString(BMF_GetFont(BMF_kHelvetica10),textString);
 }
 
-void	DebugDrawer::reportErrorWarning(const char* warningString)
+inline void	DebugDrawer::reportErrorWarning(const char* warningString)
 {
   logger.error << warningString << logger.end;
 }
 
-void	DebugDrawer::drawContactPoint(const btVector3& pointOnB,const btVector3& normalOnB,btScalar distance,int lifeTime,const btVector3& color)
+inline void	DebugDrawer::drawContactPoint(const btVector3& pointOnB,const btVector3& normalOnB,btScalar distance,int lifeTime,const btVector3& color)
 {
-  const Vector<3,float> to = toOEVec(pointOnB+normalOnB*distance);
-  const Vector<3,float> from = toOEVec(pointOnB);
-  renderer->DrawLine(Line(from,to),toOEVec(color));
-// 	if (m_debugMode & btIDebugDraw::DBG_DrawContactPoints)
-// 	{
-// 		btVector3 to=pointOnB+normalOnB*distance;
-// 		const btVector3&from = pointOnB;
-// 		glBegin(GL_LINES);
-// 		glColor3f(color.getX(), color.getY(), color.getZ());
-// 		glVertex3d(from.getX(), from.getY(), from.getZ());
-// 		glVertex3d(to.getX(), to.getY(), to.getZ());
-// 		glEnd();
-
-
-// 		glRasterPos3f(from.x(),  from.y(),  from.z());
-// 		char buf[12];
-// 		sprintf(buf," %d",lifeTime);
-//                 //		BMF_DrawString(BMF_GetFont(BMF_kHelvetica10),buf);
-
-
-// 	}
+  p1 = toOEVec(pointOnB+normalOnB*distance);
+  p0 = toOEVec(pointOnB);
+  c = toOEVec(color);
+  renderer->DrawLine(Line(p0,p1),c);
 }
 
 

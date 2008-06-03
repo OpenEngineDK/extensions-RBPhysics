@@ -20,7 +20,7 @@ namespace OpenEngine
 	{
 
 	public:
-          BulletEngine(OpenEngine::Geometry::AABB & worldAabb);
+          BulletEngine(OpenEngine::Geometry::AABB & worldAabb, OpenEngine::Math::Vector<3,float> gravity);
           ~BulletEngine();
 
           void Initialize();
@@ -29,6 +29,7 @@ namespace OpenEngine
   
           void Deinitialize();
 
+	  void ClientResetScene(btRigidBody * chassis);
           void AddRigidBody(OpenEngine::Physics::IRigidBody * body);
 
 
