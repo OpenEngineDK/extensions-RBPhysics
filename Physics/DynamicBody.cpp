@@ -2,10 +2,15 @@
 
 #include <Geometry/Box.h>
 #include <Geometry/Sphere.h>
+#include <Geometry/TriangleMesh.h>
+#include <Geometry/HeightfieldTerrainShape.h>
+#include <Core/Exceptions.h>
 
 using namespace OpenEngine::Math;
 using namespace OpenEngine::Geometry;
 using namespace OpenEngine::Scene;
+using namespace OpenEngine::Core;
+
 using namespace std;
 
 namespace OpenEngine {
@@ -19,9 +24,13 @@ namespace OpenEngine {
       angularDamping(0.0f),
       transNode(),
       mass(1.0),
+      deactivation(false),
       stateChanged(true)
     {
-      
+      if(typeid(TriangleMesh) == typeid(*this->body->GetShape()) ||
+         typeid(HeightfieldTerrainShape) == typeid(*this->body->GetShape())) {
+        throw InvalidArgument("dynamic concave bodies not supported");
+      }
     }
 
     DynamicBody::~DynamicBody() {
@@ -123,6 +132,18 @@ namespace OpenEngine {
 
     float DynamicBody::GetAngularDamping() const {
       return angularDamping;
+    }
+
+    void DynamicBody::SetDisableDeactivation(bool deactivate) 
+    {
+      this->stateChanged = true;
+      this->deactivation = deactivate;
+    }
+    
+
+    bool DynamicBody::IsDisableDeactivation() 
+    {
+      return this->deactivation;
     }
 
     bool DynamicBody::IsStateChanged() const {

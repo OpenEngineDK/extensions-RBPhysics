@@ -30,6 +30,15 @@ namespace OpenEngine
           void Deinitialize();
 
 	  void ClientResetScene(btRigidBody * chassis);
+          
+          void CreateDynamicBody(OpenEngine::Physics::IRigidBody * body, 
+                                 btCollisionShape * shape,
+                                 btTransform trans);
+ 
+          void CreateStaticBody(OpenEngine::Physics::IRigidBody * body, 
+                                btCollisionShape * shape,
+                                btTransform trans);
+         
           void AddRigidBody(OpenEngine::Physics::IRigidBody * body);
 
 
@@ -61,11 +70,6 @@ namespace OpenEngine
 					    btCollisionShape* shape);
 
 	  btCollisionShape* ConvertShape(OpenEngine::Geometry::Geometry * geom);
-
-	  btCollisionShape* CreateBox(OpenEngine::Physics::IRigidBody * body);
-	  btCollisionShape* CreateSphere(OpenEngine::Physics::IRigidBody * body);
-	  btCollisionShape* CreateMesh(OpenEngine::Physics::IRigidBody * body);
-
 
           ///this is the most important class
           btDynamicsWorld*    m_dynamicsWorld;

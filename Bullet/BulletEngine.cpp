@@ -50,7 +50,12 @@ namespace OpenEngine
       m_dynamicsWorld->setGravity(toBtVec(gravity));
     }
 
-    BulletEngine::~BulletEngine() {}
+    BulletEngine::~BulletEngine() {
+      delete m_dispatcher;
+      delete m_broadphase;
+      delete m_solver;
+      delete m_dynamicsWorld;
+    }
 
     void BulletEngine::Initialize(){}
 
@@ -69,27 +74,23 @@ namespace OpenEngine
           if(dynBody.IsStateChanged()) {
             btBody.setDamping( dynBody.GetLinearDamping() ,
                                dynBody.GetAngularDamping());
+            
+            if(dynBody.IsDisableDeactivation()) {
+              btBody.setActivationState(DISABLE_DEACTIVATION); // how to switch this off???
+            }
 
 
-            // TODO: This is still buggy. When the rotation is
-            // always reset dunno why.
             btTransform trans;
             trans.setIdentity();
             trans.setRotation(toBtQuat(dynBody.GetRotation()));
             trans.setOrigin(toBtVec(dynBody.GetPosition()));
             
-            btBody.setWorldTransform(trans);
-
             btMotionState* myMotionState = btBody.getMotionState();
             myMotionState->setWorldTransform(trans);
             btBody.setMotionState(myMotionState);
 
             btBody.setLinearVelocity(toBtVec(dynBody.GetLinearVelocity()));
             btBody.setAngularVelocity(toBtVec(dynBody.GetAngularVelocity()));
-            
-            // reinsert in physics world:
-            //             m_dynamicsWorld->removeRigidBody((*it).get<1>());
-            //             m_dynamicsWorld->addRigidBody((*it).get<1>());
           }
 
           // apply forces:
@@ -116,9 +117,10 @@ namespace OpenEngine
         btCar.applyEngineForce(oeCar.GetEngineForce(),3); // left rear wheel
 	//logger.info << oeCar.GetEngineForce() << logger.end;
 
+	// Breaking on all four wheels causes jitter when standing still
         btCar.setBrake(oeCar.GetBrake(),0);
-        btCar.setBrake(oeCar.GetBrake(),1);
-        btCar.setBrake(oeCar.GetBrake(),2);
+        //btCar.setBrake(oeCar.GetBrake(),1);
+	//btCar.setBrake(oeCar.GetBrake(),2);
         btCar.setBrake(oeCar.GetBrake(),3);
 	//logger.info << oeCar.GetBrake() << logger.end;
 
@@ -161,43 +163,15 @@ namespace OpenEngine
         oeChassis->SetLinearVelocity(toOEVec(btChassis->getLinearVelocity()));
         oeChassis->SetStateChanged(false);
 
+	int i;
+	for ( i=0; i<btCar.getNumWheels(); i++ ) {
+	  btCar.updateWheelTransform(i);
+	}
       }
     }
     
 
     void BulletEngine::Deinitialize() { }
-
-    btCollisionShape* BulletEngine::CreateBox(IRigidBody * body) {
-      const AABB & box = *dynamic_cast<const AABB* >(body->GetShape());
-	
-      Vector<3,float> size = box.GetCorner();
-
-      return new btBoxShape (toBtVec(size));
-    }
-    
-    btCollisionShape* BulletEngine::CreateSphere(IRigidBody * body) {
-      const Sphere & sphere = *dynamic_cast<const Sphere* >(body->GetShape());
-      
-      return new btSphereShape(sphere.GetRadius());
-    }
-
-    btCollisionShape* BulletEngine::CreateMesh(IRigidBody * body) {
-      TriangleMesh * triangleMesh = dynamic_cast<TriangleMesh* >(body->GetShape());
-      FaceSet * faces = triangleMesh->GetFaceSet();
-      btTriangleMesh * triMesh = new btTriangleMesh();
-      // fill triangle mesh with faces from the static geometry
-      for(FaceList::iterator it = faces->begin(); it != faces->end(); it++) {
-        FacePtr tmp = (FacePtr)*it;
-        triMesh->addTriangle(toBtVec(tmp->vert[0]), toBtVec(tmp->vert[1]), toBtVec(tmp->vert[2]));
-      }
-      //cout << "NumTriangles in triangleMesh: " << triMesh.getNumTriangles() << std::endl;
-      // make a new triangle mesh shape
-      bool useQuantizedBvhTree = true;
-      btCollisionShape* shape = NULL;
-      shape = new btBvhTriangleMeshShape(triMesh, useQuantizedBvhTree);
-      ((btBvhTriangleMeshShape*)shape)->recalcLocalAabb(); // do we need to do this?
-      return shape;
-    }
 
     void BulletEngine::ClientResetScene(btRigidBody * chassis) {
 
@@ -206,6 +180,38 @@ namespace OpenEngine
       chassis->setAngularVelocity(btVector3(0,0,0));
       m_dynamicsWorld->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(chassis->getBroadphaseHandle(),m_dynamicsWorld->getDispatcher());
 
+    }
+
+    void BulletEngine::CreateDynamicBody(IRigidBody * body, btCollisionShape * shape, btTransform trans) 
+    {
+      if(typeid(btHeightfieldTerrainShape) == typeid(*shape) ||
+         typeid(btBvhTriangleMeshShape) == typeid(*shape)) {
+        throw NotImplemented("dynamic concave bodies not supported");
+      }
+      DynamicBody & dynBody = *dynamic_cast<DynamicBody*>(body);
+        
+      btRigidBody* btBody = localCreateRigidBody(dynBody.GetMass(),trans,shape);
+
+      if(dynBody.IsDisableDeactivation()) {
+        btBody->setActivationState(DISABLE_DEACTIVATION);
+      }
+        
+      btBody->setLinearVelocity(toBtVec(dynBody.GetLinearVelocity()));
+      btBody->setAngularVelocity(toBtVec(dynBody.GetAngularVelocity()));
+
+      bodies.push_back(BodyPair(body,btBody));
+    }
+
+    void BulletEngine::CreateStaticBody(OpenEngine::Physics::IRigidBody * body, 
+                                        btCollisionShape * shape,
+                                        btTransform trans) 
+    {
+      btRigidBody* btBody = localCreateRigidBody(0.0f,trans,shape);
+      
+      //         btBody->setCollisionFlags( btBody->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
+      //         btBody->setActivationState(DISABLE_DEACTIVATION);
+      
+      bodies.push_back(BodyPair(body,btBody));
     }
 
     void BulletEngine::AddRigidBody(IRigidBody * body)
@@ -217,41 +223,11 @@ namespace OpenEngine
       trans.setRotation(toBtQuat(body->GetRotation()));
       
       // set shape
-      btCollisionShape* shape = NULL;
-      // case Sphere
-
-      if(typeid(Sphere) == typeid(*body->GetShape())) {
-        shape = CreateSphere(body);
-      }
-      // case AABB
-      else if(typeid(AABB) == typeid(*body->GetShape())) {
-        shape = CreateBox(body);
-      }
-      else if(typeid(TriangleMesh) == typeid(*body->GetShape())) {
-        shape = CreateMesh(body);
-      }
-      else if(typeid(CompoundShape) == typeid(*body->GetShape())) {
-        shape = ConvertShape(body->GetShape());
-      }
-      else if(typeid(HeightfieldTerrainShape) == typeid(*body->GetShape())) {
-        shape = ConvertShape(body->GetShape());
-      }
-      else {
-        throw NotImplemented();
-      }
-
-      btRigidBody* btBody = NULL;
+      btCollisionShape* shape = ConvertShape(body->GetShape());
       
       // create body:
       if(typeid(DynamicBody) == typeid(*body) ) {
-        DynamicBody & dynBody = *dynamic_cast<DynamicBody*>(body);
-        
-        btBody = localCreateRigidBody(dynBody.GetMass(),trans,shape);
-
-        btBody->setLinearVelocity(toBtVec(dynBody.GetLinearVelocity()));
-        btBody->setAngularVelocity(toBtVec(dynBody.GetAngularVelocity()));
-
-        bodies.push_back(BodyPair(body,btBody));
+        CreateDynamicBody(body,shape,trans);
       }
       // create car:
       else if(typeid(Car) == typeid(*body) ) {
@@ -291,16 +267,16 @@ namespace OpenEngine
         int upIndex = 1;
         int forwardIndex = 2;
         float	wheelRadius = 13.5f;
-        float	wheelWidth = 1.4f;
-        float	wheelFriction = 50;
+        float	wheelWidth = 5.4f;
+        float	wheelFriction = 5;
         btVector3 wheelDirectionCS0(0,-1,0);
         btVector3 wheelAxleCS(0,0,1);
-        float connectionHeight = 10.2f;
-        btScalar suspensionRestLength(0.6);
-        float	suspensionStiffness = 50.f;
-        float	suspensionDamping = 2.3f;
-        float	suspensionCompression = 2.4f;
-        float	rollInfluence = 5.3f;
+        float connectionHeight = 10.f;
+        btScalar suspensionRestLength(0.0);
+        float	suspensionStiffness = 200.f;
+        float	suspensionDamping = 20.3f;
+        float	suspensionCompression = 0.4f;
+        float	rollInfluence = 1.3f;
 
         vehicle->setCoordinateSystem(rightIndex,upIndex,forwardIndex);
 
@@ -334,12 +310,11 @@ namespace OpenEngine
 
       }
       else {
-        btBody = localCreateRigidBody(0.0f,trans,shape);
-
-        //         btBody->setCollisionFlags( btBody->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
-        //         btBody->setActivationState(DISABLE_DEACTIVATION);
-
-        bodies.push_back(BodyPair(body,btBody));
+        if(typeid(RigidBody) != typeid(*body)) {
+          logger.warning << "Body " << body->GetName() << " added as static body" << logger.end;
+        }
+        
+        CreateStaticBody(body,shape,trans);
       }
     }    
 
@@ -467,16 +442,13 @@ namespace OpenEngine
     {
       
       if(typeid(Sphere) == typeid(*geom)) {
-        Sphere * sphere = dynamic_cast<Sphere* >(geom);
-	
-        return new btSphereShape(sphere->GetRadius());
+        const Sphere & sphere = *dynamic_cast<const Sphere* >(geom);
+        return new btSphereShape(sphere.GetRadius());
       }
       // case Box
       else if(typeid(AABB) == typeid(*geom)) {
-        AABB * box = dynamic_cast<AABB* >(geom);
-	
-        Vector<3,float> size = box->GetCorner();
-
+        const AABB & box = *dynamic_cast<const AABB* >(geom);
+        Vector<3,float> size = box.GetCorner();
         return new btBoxShape (toBtVec(size));
       }
       else if(typeid(TriangleMesh) == typeid(*geom)) {
@@ -529,8 +501,9 @@ namespace OpenEngine
 	
 
       }
-      return NULL;
+      else {
+        throw NotImplemented();
+      }
     }
-
   }
 }

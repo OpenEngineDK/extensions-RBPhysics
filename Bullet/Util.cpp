@@ -17,7 +17,7 @@ namespace OpenEngine {
     }
 
     btQuaternion toBtQuat(const OpenEngine::Math::Quaternion<float> & in) {
-      return btQuaternion(in.GetImaginary().Get(0),in.GetImaginary().Get(0),in.GetImaginary().Get(0),in.GetReal());
+      return btQuaternion(in.GetImaginary().Get(0),in.GetImaginary().Get(1),in.GetImaginary().Get(2),in.GetReal());
     }
 
   }

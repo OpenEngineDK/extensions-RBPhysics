@@ -191,6 +191,22 @@ namespace OpenEngine {
       float GetAngularDamping() const;
 
       /**
+       * Toggle deactivation state of the body.
+       * Deactivation should be disabled if the body
+       * will be affected by forces. A disabled body will still
+       * participate in collisions.
+       * Bodies will be deactivated when they are not moving.
+       * 
+       * @param deactivate If this is set to true, deactivation is disabled.
+       */
+      void SetDisableDeactivation(bool deactivate);
+
+      /**
+       * Is Deactivation enabled for this body.
+       */
+      bool IsDisableDeactivation();
+
+      /**
        * Check if the state of the object has been change
        * from outside the physics engine.
        * This method will return true if the position,
@@ -221,6 +237,8 @@ namespace OpenEngine {
       OpenEngine::Math::Vector<3,float> torque;
       
       float mass;
+
+      bool deactivation;
 
       bool stateChanged;
     };
