@@ -1,15 +1,15 @@
 #ifndef _BULLETENGINE_H
 #define _BULLETENGINE_H
 
-#include "../Physics/IPhysEngine.h"
-#include "../Physics/IRayResultCallback.h"
-#include <src/btBulletDynamicsCommon.h>
+#include <Physics/IPhysEngine.h>
+#include <Physics/IRayResultCallback.h>
+#include <btBulletDynamicsCommon.h>
 #include <Geometry/AABB.h>
 #include <Math/Vector.h>
 #include <list>
 #include <Geometry/Geometry.h>
 #include <boost/tuple/tuple.hpp>
-#include "../Physics/Car.h"
+#include <Physics/Car.h>
 
 namespace OpenEngine 
 {

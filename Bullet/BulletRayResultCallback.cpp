@@ -13,7 +13,7 @@ namespace OpenEngine {
       RayResultCallback(),engine(engine),callback(oeCallback) {
     }
     
-    btScalar BulletRayResultCallback::AddSingleResult(btCollisionWorld::LocalRayResult & rayResult, bool normalInWorldSpace) {
+    btScalar BulletRayResultCallback::addSingleResult(btCollisionWorld::LocalRayResult & rayResult, bool normalInWorldSpace) {
 
 //       logger.info << "hitNormal: " << toOEVec(rayResult.m_hitNormalLocal);
 //       if(normalInWorldSpace) {

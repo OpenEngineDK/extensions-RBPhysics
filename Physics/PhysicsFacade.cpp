@@ -1,5 +1,5 @@
-#include "PhysicsFacade.h"
-#include "../Bullet/BulletEngine.h"
+#include <Physics/PhysicsFacade.h>
+#include <Bullet/BulletEngine.h>
 
 using namespace OpenEngine::Math;
 

@@ -5,7 +5,7 @@
 #define _BULLETRAYRESULTCALLBACK_H 1
 
 #include "BulletEngine.h"
-#include <src/BulletCollision/CollisionDispatch/btCollisionWorld.h>
+#include <BulletCollision/CollisionDispatch/btCollisionWorld.h>
 
 namespace OpenEngine {
   namespace Bullet {
@@ -16,7 +16,7 @@ namespace OpenEngine {
       BulletRayResultCallback(OpenEngine::Physics::IRayResultCallback * oeCallback,
                               BulletEngine * engine);
 
-      btScalar AddSingleResult(btCollisionWorld::LocalRayResult & rayResult, bool normalInWorldSpace);
+      btScalar addSingleResult(btCollisionWorld::LocalRayResult & rayResult, bool normalInWorldSpace);
 
     private:
       BulletEngine * engine;

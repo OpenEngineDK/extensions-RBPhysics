@@ -10,10 +10,10 @@
 #include <Geometry/HeightfieldTerrainShape.h>
 #include <Core/Exceptions.h>
 #include <Logging/Logger.h>
-#include "../Physics/RigidBody.h"
-#include "../Physics/DynamicBody.h"
-#include "BulletRayResultCallback.h"
-#include <src/BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
+#include <Physics/RigidBody.h>
+#include <Physics/DynamicBody.h>
+#include <Bullet/BulletRayResultCallback.h>
+#include <BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
 
 using OpenEngine::Core::NotImplemented;
 using namespace OpenEngine::Physics;

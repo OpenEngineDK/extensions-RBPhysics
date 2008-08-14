@@ -1,6 +1,6 @@
 #include <Renderers/IRenderNode.h>
 #include <Renderers/IRenderingView.h>
-#include <src/btBulletDynamicsCommon.h>
+#include <btBulletDynamicsCommon.h>
 #include <iostream>
 
 class BulletDebugNode : public OpenEngine::Renderers::IRenderNode
