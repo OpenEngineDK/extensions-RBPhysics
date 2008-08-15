@@ -4,14 +4,18 @@
 #ifndef _IRAYRESULTCALLBACK_H
 #define _IRAYRESULTCALLBACK_H 1
 
-#include "IRigidBody.h"
 #include <Math/Vector.h>
 
 namespace OpenEngine {
   namespace Physics {
+
+    class IRigidBody;
+
     class IRayResultCallback {
 
     public:
+
+      virtual ~IRayResultCallback() {}
 
       class RayCastResult {
         

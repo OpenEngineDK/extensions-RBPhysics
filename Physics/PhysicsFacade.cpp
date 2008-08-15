@@ -1,5 +1,13 @@
 #include <Physics/PhysicsFacade.h>
+
 #include <Bullet/BulletEngine.h>
+#include <Physics/IRayResultCallback.h>
+#include <Physics/IPhysEngine.h>
+#include <Physics/IRigidBody.h>
+#include <Renderers/IRenderNode.h>
+#include <Renderers/IRenderer.h>
+#include <Geometry/AABB.h>
+#include <Math/Vector.h>
 
 using namespace OpenEngine::Math;
 

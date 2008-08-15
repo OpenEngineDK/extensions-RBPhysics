@@ -1,7 +1,11 @@
-#include "BulletRayResultCallback.h"
+#include <Bullet/BulletRayResultCallback.h>
 
+#include <btBulletDynamicsCommon.h>
+
+#include <Bullet/BulletEngine.h>
 #include <Logging/Logger.h>
-#include "Util.h"
+#include <Bullet/Util.h>
+#include <Physics/IRayResultCallback.h>
 
 using namespace OpenEngine::Logging;
 using namespace OpenEngine::Physics;

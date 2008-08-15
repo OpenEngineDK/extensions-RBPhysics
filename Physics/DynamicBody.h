@@ -1,7 +1,8 @@
 #ifndef _PHYSICS_DYNAMICBODY_H
 #define _PHYSICS_DYNAMICBODY_H 1
 
-#include "RigidBodyDecorator.h"
+#include <Physics/RigidBodyDecorator.h>
+
 #include <Math/Vector.h>
 #include <Math/Quaternion.h>
 #include <Scene/TransformationNode.h>

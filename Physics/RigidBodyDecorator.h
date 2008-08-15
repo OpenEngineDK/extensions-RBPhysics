@@ -1,7 +1,7 @@
 #ifndef _PHYSICS_RIGIDBODYDECORATOR_H
 #define _PHYSICS_RIGIDBODYDECORATOR_H 1
 
-#include "IRigidBody.h"
+#include <Physics/IRigidBody.h>
 #include <Math/Vector.h>
 #include <Math/Quaternion.h>
 #include <Scene/TransformationNode.h>

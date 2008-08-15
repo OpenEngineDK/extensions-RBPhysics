@@ -4,7 +4,7 @@
 #ifndef _RAYPRINTNAMECALLBACK_H
 #define _RAYPRINTNAMECALLBACK_H 1
 
-#include "IRayResultCallback.h"
+#include <Physics/IRayResultCallback.h>
 
 namespace OpenEngine {
   namespace Physics {

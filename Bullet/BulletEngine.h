@@ -2,17 +2,37 @@
 #define _BULLETENGINE_H
 
 #include <Physics/IPhysEngine.h>
-#include <Physics/IRayResultCallback.h>
-#include <btBulletDynamicsCommon.h>
-#include <Geometry/AABB.h>
 #include <Math/Vector.h>
 #include <list>
 #include <Geometry/Geometry.h>
 #include <boost/tuple/tuple.hpp>
-#include <Physics/Car.h>
+
+class btRigidBody;
+class btRaycastVehicle;
+class btTransform;
+class btCollisionShape;
+class btDynamicsWorld;
+class btBroadphaseInterface;
+class btCollisionDispatcher;
+class btConstraintSolver;
+class btCollisionAlgorithmCreateFunc;
+class btDefaultCollisionConfiguration;
+
 
 namespace OpenEngine 
 {
+
+  namespace Geometry 
+    {
+      class AABB;
+    }
+
+  namespace Physics 
+    {
+      class IRayResultCallback;
+      class Car;
+    }
+
   namespace Bullet
     {
 
@@ -30,20 +50,8 @@ namespace OpenEngine
           void Deinitialize();
 
 	  void ClientResetScene(btRigidBody * chassis);
-          
-          void CreateDynamicBody(OpenEngine::Physics::IRigidBody * body, 
-                                 btCollisionShape * shape,
-                                 btTransform trans);
- 
-          void CreateStaticBody(OpenEngine::Physics::IRigidBody * body, 
-                                btCollisionShape * shape,
-                                btTransform trans);
          
           void AddRigidBody(OpenEngine::Physics::IRigidBody * body);
-
-
-	  //	void AddStaticGeometry(OpenEngine::Physics::StaticGeometry * geometry);
-
 
           void RemoveRigidBody(OpenEngine::Physics::IRigidBody * body);
 
@@ -69,7 +77,19 @@ namespace OpenEngine
 					    const btTransform& startTransform,
 					    btCollisionShape* shape);
 
+          /*
+           * Helpers for AddRigidBody:
+           */
 	  btCollisionShape* ConvertShape(OpenEngine::Geometry::Geometry * geom);
+
+          void CreateDynamicBody(OpenEngine::Physics::IRigidBody * body, 
+                                 btCollisionShape * shape,
+                                 btTransform trans);
+ 
+          void CreateStaticBody(OpenEngine::Physics::IRigidBody * body, 
+                                btCollisionShape * shape,
+                                btTransform trans);
+
 
           ///this is the most important class
           btDynamicsWorld*    m_dynamicsWorld;

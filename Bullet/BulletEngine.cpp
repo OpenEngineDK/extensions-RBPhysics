@@ -1,7 +1,8 @@
-#include "BulletEngine.h"
-#include "DebugDrawer.h"
-#include "BulletDebugNode.h"
-#include "Util.h"
+#include <Bullet/BulletEngine.h>
+
+#include <Bullet/DebugDrawer.h>
+#include <Bullet/BulletDebugNode.h>
+#include <Bullet/Util.h>
 #include <Core/IGameFactory.h>
 #include <Geometry/AABB.h>
 #include <Geometry/Sphere.h>
@@ -12,8 +13,12 @@
 #include <Logging/Logger.h>
 #include <Physics/RigidBody.h>
 #include <Physics/DynamicBody.h>
+#include <Physics/CarConfig.h>
+#include <Physics/IRayResultCallback.h>
+#include <Physics/Car.h>
 #include <Bullet/BulletRayResultCallback.h>
 #include <BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
+#include <btBulletDynamicsCommon.h>
 
 using OpenEngine::Core::NotImplemented;
 using namespace OpenEngine::Physics;
@@ -111,25 +116,53 @@ namespace OpenEngine
         Car & oeCar = *(*it).get<0>();
         btRaycastVehicle & btCar = *(*it).get<1>();
 
-        btCar.applyEngineForce(oeCar.GetEngineForce(),0); // right rear wheel
-        btCar.applyEngineForce(oeCar.GetEngineForce(),1); // right front wheel
-        btCar.applyEngineForce(oeCar.GetEngineForce(),2); // left front wheel
-        btCar.applyEngineForce(oeCar.GetEngineForce(),3); // left rear wheel
-	//logger.info << oeCar.GetEngineForce() << logger.end;
+        CarConfig & config = oeCar.GetConfig();
 
-	// Breaking on all four wheels causes jitter when standing still
-        btCar.setBrake(oeCar.GetBrake(),0);
-        //btCar.setBrake(oeCar.GetBrake(),1);
-	//btCar.setBrake(oeCar.GetBrake(),2);
-        btCar.setBrake(oeCar.GetBrake(),3);
-	//logger.info << oeCar.GetBrake() << logger.end;
+        const float turnPercent = (fabs(oeCar.GetTurn()) < 0.01 ? 0 : oeCar.GetTurn());
+        const float forcePercent = oeCar.GetEngineForce();
+        const float breakForcePercent = oeCar.GetBrake();
 
-        btCar.setSteeringValue(oeCar.GetTurn(),1);
-        btCar.setSteeringValue(oeCar.GetTurn(),2);
-        //logger.info << oeCar.GetTurn() << logger.end;
+        if(oeCar.GetConfig().tankSteer) {
+
+          const float leftEngine = 
+            (forcePercent * config.maxEngineForce) +
+            (-turnPercent * config.maxSteerAngle * config.maxEngineForce);
+          const float rightEngine = 
+            (forcePercent * config.maxEngineForce)+
+            ( turnPercent * config.maxSteerAngle * config.maxEngineForce);
+
+          for (int i=0;i<btCar.getNumWheels();i++) {
+            btCar.applyEngineForce(( i%2==0 ? leftEngine : rightEngine),i);
+            btCar.setBrake(breakForcePercent*config.maxBreakForce,i);
+          }
+        }
+        else {
+          btCar.applyEngineForce(forcePercent * config.maxEngineForce,0);
+          btCar.applyEngineForce(forcePercent * config.maxEngineForce,1);
+          btCar.applyEngineForce(forcePercent * config.maxEngineForce,2);
+          btCar.applyEngineForce(forcePercent * config.maxEngineForce,3);
+
+          const float breakingBalance = oeCar.GetConfig().GetBreakingBalance();
+
+          // Breaking on all four wheels causes jitter when standing still
+          btCar.setBrake(breakForcePercent * config.maxBreakForce * breakingBalance,0);
+          btCar.setBrake(breakForcePercent * config.maxBreakForce * breakingBalance,1);
+          btCar.setBrake(breakForcePercent * config.maxBreakForce * (1-breakingBalance),2);
+          btCar.setBrake(breakForcePercent * config.maxBreakForce * (1-breakingBalance),3);
+          //logger.info << breakForcePercent << logger.end;
+
+
+          btCar.setSteeringValue(-1 * turnPercent * config.maxSteerAngle,0);
+          btCar.setSteeringValue(-1 * turnPercent * config.maxSteerAngle,1);
+          if(oeCar.GetConfig().allWheelSteer) {
+            btCar.setSteeringValue(turnPercent * config.maxSteerAngle,2);
+            btCar.setSteeringValue(turnPercent * config.maxSteerAngle,3);
+          }
+        }
+        //logger.info << turnPercent << logger.end;
       }
 
-      m_dynamicsWorld->stepSimulation(1.0f/deltaTime,5);
+      m_dynamicsWorld->stepSimulation(1.0f/deltaTime,1);
 
       for(list< BodyPair >::iterator it = bodies.begin();
           it != bodies.end(); it++) {
@@ -163,10 +196,9 @@ namespace OpenEngine
         oeChassis->SetLinearVelocity(toOEVec(btChassis->getLinearVelocity()));
         oeChassis->SetStateChanged(false);
 
-	int i;
-	for ( i=0; i<btCar.getNumWheels(); i++ ) {
-	  btCar.updateWheelTransform(i);
-	}
+// 	for (int i=0; i<btCar.getNumWheels(); i++ ) {
+// 	  btCar.updateWheelTransform(i);
+// 	}
       }
     }
     
@@ -178,7 +210,8 @@ namespace OpenEngine
       chassis->setCenterOfMassTransform(btTransform::getIdentity());
       chassis->setLinearVelocity(btVector3(0,0,0));
       chassis->setAngularVelocity(btVector3(0,0,0));
-      m_dynamicsWorld->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(chassis->getBroadphaseHandle(),m_dynamicsWorld->getDispatcher());
+      m_dynamicsWorld->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(chassis->getBroadphaseHandle(),
+                                                                                       m_dynamicsWorld->getDispatcher());
 
     }
 
@@ -231,81 +264,84 @@ namespace OpenEngine
       }
       // create car:
       else if(typeid(Car) == typeid(*body) ) {
-        DynamicBody * chassis = (dynamic_cast<Car*>(body))->GetChassis();
 
-	btCollisionShape* chassisShape = new btBoxShape(btVector3(20.f,10.f,20.f));
-	btCompoundShape* compound = new btCompoundShape();
-	btTransform localTrans;
-	localTrans.setIdentity();
-	localTrans.setOrigin(btVector3(0,10,0));
-	compound->addChildShape(localTrans,chassisShape);
-	//trans.setOrigin(btVector3(0,0.f,0));
-	btRigidBody * btBody = localCreateRigidBody(chassis->GetMass(),trans,compound);
+        if(typeid(*body->GetShape()) != typeid(AABB)) {
+          throw NotImplemented("Only AABB implemented as shape for a car.");
+        }
+        Car * car = dynamic_cast<Car*>(body);
+        DynamicBody * chassis = car->GetChassis();
+	btCollisionShape* chassisShape = ConvertShape(chassis->GetShape());
+        CarConfig & carConfig(car->GetConfig());
 
-	//        btRigidBody * btBody = localCreateRigidBody(chassis->GetMass(),trans,shape);
-
-        //	ClientResetScene(btBody);
-
+        // create rigid body
+        btDefaultMotionState* myMotionState = new btDefaultMotionState(trans);
+        btVector3 localInertia(0,0,0);
+        chassisShape->calculateLocalInertia(chassis->GetMass(),localInertia);
+        btRigidBody::btRigidBodyConstructionInfo cInfo(chassis->GetMass(),myMotionState,chassisShape,localInertia);
+        btRigidBody* btBody = new btRigidBody(cInfo);
+        btBody->setActivationState(DISABLE_DEACTIVATION);
+        m_dynamicsWorld->addRigidBody(btBody);
         btBody->setLinearVelocity(toBtVec(chassis->GetLinearVelocity()));
         btBody->setAngularVelocity(toBtVec(chassis->GetAngularVelocity()));
 
+        // create vehicle
         btRaycastVehicle::btVehicleTuning * tuning =
           new btRaycastVehicle::btVehicleTuning();
-
         btVehicleRaycaster * raycaster =
           new btDefaultVehicleRaycaster(m_dynamicsWorld);
-
         btRaycastVehicle * vehicle = new btRaycastVehicle(*tuning,btBody,raycaster);
-
         cars.push_back(CarPair(dynamic_cast<Car*>(body),vehicle));
-
-        btBody->setActivationState(DISABLE_DEACTIVATION);
-
         m_dynamicsWorld->addVehicle(vehicle);
+        vehicle->setCoordinateSystem(carConfig.rightIndex,
+                                     carConfig.upIndex,
+                                     carConfig.forwardIndex);
 
-        int rightIndex = 0;
-        int upIndex = 1;
-        int forwardIndex = 2;
-        float	wheelRadius = 13.5f;
-        float	wheelWidth = 5.4f;
-        float	wheelFriction = 5;
-        btVector3 wheelDirectionCS0(0,-1,0);
-        btVector3 wheelAxleCS(0,0,1);
-        float connectionHeight = 10.f;
-        btScalar suspensionRestLength(0.0);
-        float	suspensionStiffness = 200.f;
-        float	suspensionDamping = 20.3f;
-        float	suspensionCompression = 0.4f;
-        float	rollInfluence = 1.3f;
+        bool isFrontWheel = true;
+        bool isLeftWheel = true;
+        
+        const int numWheels = carConfig.GetNumberOfWheels();
 
-        vehicle->setCoordinateSystem(rightIndex,upIndex,forwardIndex);
+        const float wheelSpacing = (carConfig.wheelDistanceLength*2)/((numWheels/2)-1);
+        
+        
+        for(int i = 0; i < numWheels; i++) {
 
-#define CUBE_HALF_EXTENTS 15
+          int sideIndex = (i%2 == 0) ? i/2 : (i-1)/2;
 
-        bool isFrontWheel=true;
+          float position = carConfig.wheelDistanceLength - (wheelSpacing*sideIndex);
 
-        btVector3 connectionPointCS0(CUBE_HALF_EXTENTS-(0.3*wheelWidth),connectionHeight,2*CUBE_HALF_EXTENTS-wheelRadius);
-        vehicle->addWheel(connectionPointCS0,wheelDirectionCS0,wheelAxleCS,suspensionRestLength,wheelRadius,*tuning,isFrontWheel);
+//           logger.info << "sideIndex " << sideIndex << logger.end;
+//           logger.info << "position " << position << logger.end;
 
-        connectionPointCS0 = btVector3(-CUBE_HALF_EXTENTS+(0.3*wheelWidth),connectionHeight,2*CUBE_HALF_EXTENTS-wheelRadius);
-        vehicle->addWheel(connectionPointCS0,wheelDirectionCS0,wheelAxleCS,suspensionRestLength,wheelRadius,*tuning,isFrontWheel);
+          isFrontWheel = (i < 2);
+          isLeftWheel = (i%2 == 0);
+          
+          btVector3 connectionPointCS0((isFrontWheel ? 1 : -1)*carConfig.wheelDistanceLength,
+                                       carConfig.connectionHeight,
+                                       (isLeftWheel ? 1 : -1)*carConfig.wheelDistanceWidth);
 
-        isFrontWheel = false;
+          vehicle->addWheel(connectionPointCS0,
+                            toBtVec(carConfig.wheelDirectionCS0),
+                            toBtVec(carConfig.wheelAxleCS),
+                            carConfig.suspensionRestLength,
+                            carConfig.wheelRadius,
+                            *tuning,
+                            true);
 
-        connectionPointCS0 = btVector3(-CUBE_HALF_EXTENTS+(0.3*wheelWidth),connectionHeight,-2*CUBE_HALF_EXTENTS+wheelRadius);
-        vehicle->addWheel(connectionPointCS0,wheelDirectionCS0,wheelAxleCS,suspensionRestLength,wheelRadius,*tuning,isFrontWheel);
+          
+        }
 
-        connectionPointCS0 = btVector3(CUBE_HALF_EXTENTS-(0.3*wheelWidth),connectionHeight,-2*CUBE_HALF_EXTENTS+wheelRadius);
-        vehicle->addWheel(connectionPointCS0,wheelDirectionCS0,wheelAxleCS,suspensionRestLength,wheelRadius,*tuning,isFrontWheel);
+        //        logger.info << "numWheels" << vehicle->getNumWheels() << logger.end;
+        
 		
         for (int i=0;i<vehicle->getNumWheels();i++)
           {
             btWheelInfo& wheel = vehicle->getWheelInfo(i);
-            wheel.m_suspensionStiffness = suspensionStiffness;
-            wheel.m_wheelsDampingRelaxation = suspensionDamping;
-            wheel.m_wheelsDampingCompression = suspensionCompression;
-            wheel.m_frictionSlip = wheelFriction;
-            wheel.m_rollInfluence = rollInfluence;
+            wheel.m_suspensionStiffness = carConfig.suspensionStiffness;
+            wheel.m_wheelsDampingRelaxation = carConfig.suspensionDamping;
+            wheel.m_wheelsDampingCompression = carConfig.suspensionCompression;
+            wheel.m_frictionSlip = carConfig.wheelFriction;
+            wheel.m_rollInfluence = carConfig.rollInfluence;
           }
 
       }
@@ -421,10 +457,9 @@ namespace OpenEngine
       bool isDynamic = (mass != 0.f);
 
       btVector3 localInertia(0,0,0);
-      if (isDynamic)
+      if (isDynamic) {
         shape->calculateLocalInertia(mass,localInertia);
-
-      //using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
+      }
 
       btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
 

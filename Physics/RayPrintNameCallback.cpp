@@ -1,6 +1,7 @@
 #include "RayPrintNameCallback.h"
 
 #include <Logging/Logger.h>
+#include <Physics/IRigidBody.h>
 
 using namespace OpenEngine::Logging;
 

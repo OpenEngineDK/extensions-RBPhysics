@@ -1,6 +1,7 @@
+INCLUDE_DIRECTORIES("${OE_EXTENSIONS_DIR}/bullet/src")
 
 # Create the extension library
-ADD_LIBRARY( Extensions_RBPhysics
+ADD_LIBRARY(Extensions_RBPhysics
   RigidBody/Properties.cpp
   RigidBody/RigidBody.cpp
   Physics/PhysicsFacade.cpp
@@ -9,6 +10,7 @@ ADD_LIBRARY( Extensions_RBPhysics
   Physics/RigidBodyDecorator.cpp
   Physics/RayPrintNameCallback.cpp
   Physics/Car.cpp
+  Physics/CarConfig.cpp
   Bullet/BulletEngine.cpp
   Bullet/DebugDrawer.cpp
   Bullet/Util.cpp
@@ -20,5 +22,8 @@ ADD_LIBRARY( Extensions_RBPhysics
 )
 
 TARGET_LINK_LIBRARIES( Extensions_RBPhysics
-  ${BULLET_LIBRARIES}
+  LibBulletDynamics
+  LibBulletCollision
+  LibLinearMath
+  LibBulletSoftBody
 )

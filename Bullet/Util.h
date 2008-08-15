@@ -3,8 +3,9 @@
 
 #include <Math/Vector.h>
 #include <Math/Quaternion.h>
-#include "LinearMath/btVector3.h"
-#include "LinearMath/btQuaternion.h"
+
+class btVector3;
+class btQuaternion;
 
 namespace OpenEngine {
   namespace Bullet {

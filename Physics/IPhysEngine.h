@@ -2,13 +2,14 @@
 #define _IPHYSENGINE_H
 
 #include <Renderers/IRenderNode.h>
-#include "IRigidBody.h"
-#include "IRayResultCallback.h"
 
 namespace OpenEngine 
 {
   namespace Physics
   {
+
+    class IRigidBody;
+    class IRayResultCallback;
 
     class IPhysEngine 
     {

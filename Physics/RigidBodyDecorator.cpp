@@ -1,4 +1,4 @@
-#include "RigidBodyDecorator.h"
+#include <Physics/RigidBodyDecorator.h>
 
 using namespace std;
 

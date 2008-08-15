@@ -1,4 +1,4 @@
-#include "DynamicBody.h"
+#include <Physics/DynamicBody.h>
 
 #include <Geometry/Box.h>
 #include <Geometry/Sphere.h>

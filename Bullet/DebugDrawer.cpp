@@ -1,9 +1,7 @@
+#include <Bullet/DebugDrawer.h>
 
-#include "DebugDrawer.h"
-
-#include "LinearMath/btPoint3.h"
-
-#include "Util.h"
+#include <LinearMath/btPoint3.h>
+#include <Bullet/Util.h>
 #include <Geometry/Line.h>
 #include <Geometry/Face.h>
 #include <Logging/Logger.h>

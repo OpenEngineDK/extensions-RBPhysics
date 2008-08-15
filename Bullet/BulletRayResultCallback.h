@@ -4,11 +4,18 @@
 #ifndef _BULLETRAYRESULTCALLBACK_H
 #define _BULLETRAYRESULTCALLBACK_H 1
 
-#include "BulletEngine.h"
 #include <BulletCollision/CollisionDispatch/btCollisionWorld.h>
 
 namespace OpenEngine {
+
+  namespace Physics 
+    {
+      class IRayResultCallback;
+    }
+
   namespace Bullet {
+
+    class BulletEngine;
 
     class BulletRayResultCallback : public btCollisionWorld::RayResultCallback {
       

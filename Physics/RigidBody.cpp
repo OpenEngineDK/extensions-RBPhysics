@@ -1,4 +1,4 @@
-#include "RigidBody.h"
+#include <Physics/RigidBody.h>
 
 #include <Geometry/Box.h>
 #include <Geometry/Sphere.h>

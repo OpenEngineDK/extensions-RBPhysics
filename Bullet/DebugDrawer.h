@@ -33,7 +33,7 @@ class DebugDrawer : public btIDebugDraw
 
   inline virtual void	draw3dText(const btVector3& location,const char* textString);
 
-  inline virtual void	setDebugMode(int debugMode);
+  virtual void	setDebugMode(int debugMode);
 
   inline virtual int   getDebugMode() const { return m_debugMode;}
 

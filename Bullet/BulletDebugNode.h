@@ -1,7 +1,15 @@
+#ifndef PHYSICS_BULLET_DEBUG_NODE
+#define PHYSICS_BULLET_DEBUG_NODE
+
 #include <Renderers/IRenderNode.h>
 #include <Renderers/IRenderingView.h>
 #include <btBulletDynamicsCommon.h>
 #include <iostream>
+
+namespace OpenEngine 
+{
+  namespace Bullet 
+    {
 
 class BulletDebugNode : public OpenEngine::Renderers::IRenderNode
 {
@@ -29,3 +37,8 @@ class BulletDebugNode : public OpenEngine::Renderers::IRenderNode
 /*     m_camera->LookAt(0,5,0); */
   }
 };
+    }
+}
+
+
+#endif

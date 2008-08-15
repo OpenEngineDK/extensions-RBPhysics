@@ -1,4 +1,7 @@
-#include "Util.h"
+#include <Bullet/Util.h>
+
+#include "LinearMath/btVector3.h"
+#include "LinearMath/btQuaternion.h"
 
 namespace OpenEngine {
   namespace Bullet {

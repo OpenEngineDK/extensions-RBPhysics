@@ -1,7 +1,10 @@
-#include "Car.h"
+#include <Physics/Car.h>
 
 #include <Geometry/Box.h>
 #include <Geometry/Sphere.h>
+#include <Geometry/AABB.h>
+#include <Physics/DynamicBody.h>
+#include <Geometry/BoundingGeometry.h>
 
 using namespace OpenEngine::Math;
 using namespace OpenEngine::Geometry;
@@ -12,8 +15,9 @@ namespace OpenEngine {
   namespace Physics {
     
     Car::Car(DynamicBody * chassis)  :
-      RigidBodyDecorator(chassis) {
-
+      RigidBodyDecorator(chassis),
+      config(*dynamic_cast<AABB*>(chassis->GetShape()))
+    { 
     }
 
     Car::~Car() {
@@ -57,5 +61,10 @@ namespace OpenEngine {
       return dynamic_cast<DynamicBody*>(body);
     }
 
+    CarConfig & Car::GetConfig() 
+    {
+      return config;
+    }
+    
   }
 }

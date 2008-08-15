@@ -2,18 +2,27 @@
 #define _PHYSICSFACADE_H 1
 
 #include <Core/IModule.h>
-#include "IPhysEngine.h"
-#include "IRigidBody.h"
-#include "IRayResultCallback.h"
-#include <Renderers/IRenderNode.h>
-#include <Renderers/IRenderer.h>
-#include <Geometry/AABB.h>
 #include <Math/Vector.h>
 
 namespace OpenEngine {
 
+  namespace Renderers 
+    {
+      class IRenderNode;
+      class IRenderer;
+    }
+
+  namespace Geometry 
+    {
+      class AABB;
+    }
+
   namespace Physics {
 
+    class IRayResultCallback;
+    class IRigidBody;
+    class IPhysEngine;
+    
     /**
      * This is the main interface to the physics engine.
      * It will create a instance of a concrete physics engine
