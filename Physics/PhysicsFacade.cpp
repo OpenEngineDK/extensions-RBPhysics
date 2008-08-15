@@ -8,8 +8,11 @@
 #include <Renderers/IRenderer.h>
 #include <Geometry/AABB.h>
 #include <Math/Vector.h>
+#include <Logging/Logger.h>
 
 using namespace OpenEngine::Math;
+using namespace OpenEngine::Core;
+using namespace OpenEngine::Logging;
 
 namespace OpenEngine {
 
@@ -21,18 +24,23 @@ namespace OpenEngine {
       physEngine->Initialize();
     }
 
-    void PhysicsFacade::Initialize() 
-    {
 
+    void PhysicsFacade::Handle(InitializeEventArg arg) 
+    {
     }
-
-
-    void PhysicsFacade::Process(const float deltaTime, const float percent) 
+    
+    void PhysicsFacade::Handle(ProcessEventArg arg)
     {
+      float deltaTime = 1;
+      float percent = 1;
+      
+      logger.error << "timing broken in PhysicsFacade" << logger.end;
+      
+
       physEngine->Process(deltaTime, percent);
     }
-
-    void PhysicsFacade::Deinitialize() 
+    
+    void PhysicsFacade::Handle(DeinitializeEventArg arg) 
     {
       physEngine->Deinitialize();
     }
@@ -53,12 +61,6 @@ namespace OpenEngine {
 
     void PhysicsFacade::RemoveRigidBody(IRigidBody * body) {
       physEngine->RemoveRigidBody(body);
-    }
-
-
-    bool PhysicsFacade::IsTypeOf(const std::type_info& inf) 
-    {
-      return typeid(PhysicsFacade) == inf;
     }
 
     OpenEngine::Renderers::IRenderNode * PhysicsFacade::getRenderNode(OpenEngine::Renderers::IRenderer * renderer) {
