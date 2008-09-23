@@ -41,6 +41,7 @@ FIND_LIBRARY(LIBBULLETDYNAMICS
   ${PROJECT_SOURCE_DIR}/libraries
   ${PROJECT_SOURCE_DIR}/libraries/bullet2.70/lib
   ${PROJECT_SOURCE_DIR}/libraries/bullet2.70/lib/linux
+  ${PROJECT_SOURCE_DIR}/libraries/bullet2.70/lib/mac-i32
   ENV LD_LIBRARY_PATH
   ENV LIBRARY_PATH
   /usr/lib
@@ -63,6 +64,7 @@ FIND_LIBRARY(LIBBULLETCOLLISION
   ${PROJECT_SOURCE_DIR}/libraries
   ${PROJECT_SOURCE_DIR}/libraries/bullet2.70/lib
   ${PROJECT_SOURCE_DIR}/libraries/bullet2.70/lib/linux
+  ${PROJECT_SOURCE_DIR}/libraries/bullet2.70/lib/mac-i32
   ENV LD_LIBRARY_PATH
   ENV LIBRARY_PATH
   /usr/lib
@@ -84,6 +86,7 @@ FIND_LIBRARY(LIBBULLETMATH
   ${PROJECT_SOURCE_DIR}/libraries
   ${PROJECT_SOURCE_DIR}/libraries/bullet2.70/lib
   ${PROJECT_SOURCE_DIR}/libraries/bullet2.70/lib/linux
+  ${PROJECT_SOURCE_DIR}/libraries/bullet2.70/lib/mac-i32
   ENV LD_LIBRARY_PATH
   ENV LIBRARY_PATH
   /usr/lib
@@ -105,6 +108,7 @@ FIND_LIBRARY(LIBBULLETSOFTBODY
   ${PROJECT_SOURCE_DIR}/libraries
   ${PROJECT_SOURCE_DIR}/libraries/bullet2.70/lib
   ${PROJECT_SOURCE_DIR}/libraries/bullet2.70/lib/linux
+  ${PROJECT_SOURCE_DIR}/libraries/bullet2.70/lib/mac-i32
   ENV LD_LIBRARY_PATH
   ENV LIBRARY_PATH
   /usr/lib
