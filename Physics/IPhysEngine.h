@@ -19,7 +19,7 @@ namespace OpenEngine
 
       // Methods as in IModule
       virtual void Initialize() = 0;
-      virtual void Process(const float deltaTime, const float percent) = 0;
+      virtual void Process(const float deltaTime) = 0;
       virtual void Deinitialize() = 0;
 
 

@@ -45,7 +45,7 @@ namespace OpenEngine
 
           void Initialize();
   
-          void Process(const float deltaTime, const float percent);
+          void Process(const float deltaTime);
   
           void Deinitialize();
 

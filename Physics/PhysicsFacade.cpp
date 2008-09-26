@@ -31,13 +31,8 @@ namespace OpenEngine {
     
     void PhysicsFacade::Handle(ProcessEventArg arg)
     {
-      float deltaTime = 1;
-      float percent = 1;
-      
-      logger.error << "timing broken in PhysicsFacade" << logger.end;
-      
-
-      physEngine->Process(deltaTime, percent);
+      float deltaTime = arg.approx / 1000.0;
+      physEngine->Process(deltaTime);
     }
     
     void PhysicsFacade::Handle(DeinitializeEventArg arg) 

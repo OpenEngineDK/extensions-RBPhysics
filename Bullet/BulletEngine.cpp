@@ -65,7 +65,7 @@ namespace OpenEngine
     void BulletEngine::Initialize(){}
 
 
-    void BulletEngine::Process(const float deltaTime, const float percent) 
+    void BulletEngine::Process(const float deltaTime) 
     {
       for(list< BodyPair >::iterator it = bodies.begin();
           it != bodies.end(); it++) {
@@ -301,14 +301,14 @@ namespace OpenEngine
         
         const int numWheels = carConfig.GetNumberOfWheels();
 
-        const float wheelSpacing = (carConfig.wheelDistanceLength*2)/((numWheels/2)-1);
+        //@todo: unused variable: const float wheelSpacing = (carConfig.wheelDistanceLength*2)/((numWheels/2)-1);
         
         
-        for(int i = 0; i < numWheels; i++) {
+        for (int i = 0; i < numWheels; i++) {
 
-          int sideIndex = (i%2 == 0) ? i/2 : (i-1)/2;
+          //@todo: unused variable: int sideIndex = (i%2 == 0) ? i/2 : (i-1)/2;
 
-          float position = carConfig.wheelDistanceLength - (wheelSpacing*sideIndex);
+          //@todo: unused variable: float position = carConfig.wheelDistanceLength - (wheelSpacing*sideIndex);
 
 //           logger.info << "sideIndex " << sideIndex << logger.end;
 //           logger.info << "position " << position << logger.end;
