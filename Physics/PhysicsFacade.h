@@ -8,10 +8,11 @@ namespace OpenEngine {
 
   namespace Renderers 
     {
-      class IRenderNode;
       class IRenderer;
     }
-
+  namespace Scene {
+      class RenderNode;
+  }
   namespace Geometry 
     {
       class AABB;
@@ -45,7 +46,7 @@ namespace OpenEngine {
        * @param renderer The renderer that should be used to render the debug information
        * @return A Render node that should be added to the root of the scene.
        */
-      OpenEngine::Renderers::IRenderNode * getRenderNode(OpenEngine::Renderers::IRenderer * renderer);
+      OpenEngine::Scene::RenderNode * getRenderNode(OpenEngine::Renderers::IRenderer * renderer);
 
       /**
        * Add a rigid body to the physics engine.

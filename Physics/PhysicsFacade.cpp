@@ -4,7 +4,7 @@
 #include <Physics/IRayResultCallback.h>
 #include <Physics/IPhysEngine.h>
 #include <Physics/IRigidBody.h>
-#include <Renderers/IRenderNode.h>
+#include <Scene/RenderNode.h>
 #include <Renderers/IRenderer.h>
 #include <Geometry/AABB.h>
 #include <Math/Vector.h>
@@ -58,7 +58,7 @@ namespace OpenEngine {
       physEngine->RemoveRigidBody(body);
     }
 
-    OpenEngine::Renderers::IRenderNode * PhysicsFacade::getRenderNode(OpenEngine::Renderers::IRenderer * renderer) {
+    OpenEngine::Scene::RenderNode * PhysicsFacade::getRenderNode(OpenEngine::Renderers::IRenderer * renderer) {
       return physEngine->getRenderNode(renderer);
     }
   }

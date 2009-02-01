@@ -62,7 +62,7 @@ namespace OpenEngine
                        const OpenEngine::Math::Vector<3,float> & end,
                        OpenEngine::Physics::IRayResultCallback * callback);
 
-          OpenEngine::Renderers::IRenderNode *
+          OpenEngine::Scene::RenderNode *
 	    getRenderNode(OpenEngine::Renderers::IRenderer * renderer);
 
           typedef boost::tuple<OpenEngine::Physics::IRigidBody*,btRigidBody*> BodyPair;

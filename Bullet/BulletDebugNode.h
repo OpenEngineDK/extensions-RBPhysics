@@ -1,7 +1,7 @@
 #ifndef PHYSICS_BULLET_DEBUG_NODE
 #define PHYSICS_BULLET_DEBUG_NODE
 
-#include <Renderers/IRenderNode.h>
+#include <Scene/RenderNode.h>
 #include <Renderers/IRenderingView.h>
 #include <btBulletDynamicsCommon.h>
 #include <iostream>
@@ -11,7 +11,7 @@ namespace OpenEngine
   namespace Bullet 
     {
 
-class BulletDebugNode : public OpenEngine::Renderers::IRenderNode
+class BulletDebugNode : public OpenEngine::Scene::RenderNode
 {
 
  public:

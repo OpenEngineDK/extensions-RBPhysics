@@ -1,7 +1,7 @@
 #ifndef _IPHYSENGINE_H
 #define _IPHYSENGINE_H
 
-#include <Renderers/IRenderNode.h>
+#include <Scene/RenderNode.h>
 
 namespace OpenEngine 
 {
@@ -52,7 +52,7 @@ namespace OpenEngine
        * @param renderer The renderer that should be used to render the debug information
        * @return A Render node that should be added to the root of the scene.
        */
-      virtual OpenEngine::Renderers::IRenderNode * getRenderNode(OpenEngine::Renderers::IRenderer * renderer) = 0;
+      virtual OpenEngine::Scene::RenderNode * getRenderNode(OpenEngine::Renderers::IRenderer * renderer) = 0;
     };
   }
 }

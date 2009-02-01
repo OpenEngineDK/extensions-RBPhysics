@@ -443,7 +443,7 @@ namespace OpenEngine
       m_dynamicsWorld->rayTest(btBegin,btEnd,btcallback);
     }
 
-    OpenEngine::Renderers::IRenderNode * BulletEngine::getRenderNode(OpenEngine::Renderers::IRenderer * renderer) 
+      OpenEngine::Scene::RenderNode * BulletEngine::getRenderNode(OpenEngine::Renderers::IRenderer * renderer) 
     {
       DebugDrawer * draw = new DebugDrawer(renderer);
       draw->setDebugMode(btIDebugDraw::DBG_MAX_DEBUG_DRAW_MODE);
