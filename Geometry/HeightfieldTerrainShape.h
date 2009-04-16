@@ -5,7 +5,7 @@
 #include <Resources/ITextureResource.h>
 #include <string>
 #include <vector>
-
+#include <Math/Vector.h>
 
 namespace OpenEngine {
   namespace Geometry {

@@ -24,11 +24,11 @@ namespace OpenEngine {
 
       explicit CompoundShape();
 
-      void addChildShape(TransformationNode * trans, BoundingGeometry * childShape);
+      void addChildShape(TransformationNode * trans, Geometry * childShape);
 
       int getNumChildShapes();
 
-      BoundingGeometry * getChildShape(int index);
+      Geometry * getChildShape(int index);
 
       TransformationNode * getChildTransform(int index);
 
@@ -40,7 +40,7 @@ namespace OpenEngine {
 
 	TransformationNode * trans;
 
-	BoundingGeometry * childShape;
+	Geometry * childShape;
 	
       };
 

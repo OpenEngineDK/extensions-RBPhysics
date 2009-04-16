@@ -10,7 +10,7 @@ namespace OpenEngine {
       children = vector<CompoundShapeChild>();
     }
 
-    void CompoundShape::addChildShape(TransformationNode * trans, BoundingGeometry * childShape) {
+    void CompoundShape::addChildShape(TransformationNode * trans, Geometry * childShape) {
       CompoundShapeChild child;
       child.trans = trans;
       child.childShape = childShape;
@@ -23,7 +23,7 @@ namespace OpenEngine {
 	return children.size();
       }
 
-      BoundingGeometry * CompoundShape::getChildShape(int index)
+      Geometry * CompoundShape::getChildShape(int index)
       {
 	return children[index].childShape;
       }

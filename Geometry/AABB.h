@@ -12,6 +12,7 @@
 
 #include <Geometry/FaceSet.h>
 #include <Geometry/BoundingGeometry.h>
+#include <Geometry/Geometry.h>
 #include <Scene/ISceneNode.h>
 #include <Scene/GeometryNode.h>
 #include <string>
@@ -30,7 +31,7 @@ using std::vector;
  *
  * @class Box Box.h Geometry/Box.h
  */
-class AABB : public BoundingGeometry {
+ class AABB : public BoundingGeometry, public Geometry {
 
 friend class Geometry;
     
