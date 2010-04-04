@@ -12,7 +12,7 @@ using namespace std;
 namespace OpenEngine {
   namespace Physics {
     
-    RigidBody::RigidBody(OpenEngine::Geometry::Geometry * shape) :
+    RigidBody::RigidBody(OpenEngine::Geometry::GeometryBase * shape) :
       transNode(),
       shape(shape),
       name("")
@@ -32,7 +32,7 @@ namespace OpenEngine {
       return transNode.GetRotation();
     }
     
-    OpenEngine::Geometry::Geometry * RigidBody::GetShape() {
+    OpenEngine::Geometry::GeometryBase * RigidBody::GetShape() {
       return shape;
     }    
     

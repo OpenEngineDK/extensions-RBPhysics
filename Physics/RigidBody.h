@@ -24,14 +24,14 @@ namespace OpenEngine {
        * @param transNode TransformationNode controled by the physics engine
        * @param shape The shape of the rigid body used for collisions
        */
-      RigidBody(OpenEngine::Geometry::Geometry * shape);
+      RigidBody(OpenEngine::Geometry::GeometryBase * shape);
 
       ~RigidBody();
 
       // Inherited from IRigidBody:
       OpenEngine::Math::Vector<3,float> GetPosition();
       OpenEngine::Math::Quaternion<float> GetRotation();
-      OpenEngine::Geometry::Geometry * GetShape();
+      OpenEngine::Geometry::GeometryBase * GetShape();
       void SetPosition(OpenEngine::Math::Vector<3,float> pos);
       void SetRotation(OpenEngine::Math::Quaternion<float> rot);
       OpenEngine::Scene::TransformationNode * GetTransformationNode();
@@ -40,7 +40,7 @@ namespace OpenEngine {
 
     private:
       OpenEngine::Scene::TransformationNode transNode;
-      OpenEngine::Geometry::Geometry * shape;
+      OpenEngine::Geometry::GeometryBase * shape;
       std::string name;
     };
 

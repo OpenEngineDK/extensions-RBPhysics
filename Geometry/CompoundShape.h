@@ -16,7 +16,7 @@ namespace OpenEngine {
     using namespace OpenEngine::Scene;
     using std::vector;
 
-    class CompoundShape : public Geometry {
+    class CompoundShape : public GeometryBase {
 
     public:
 
@@ -24,11 +24,11 @@ namespace OpenEngine {
 
       explicit CompoundShape();
 
-      void addChildShape(TransformationNode * trans, Geometry * childShape);
+      void addChildShape(TransformationNode * trans, GeometryBase * childShape);
 
       int getNumChildShapes();
 
-      Geometry * getChildShape(int index);
+      GeometryBase * getChildShape(int index);
 
       TransformationNode * getChildTransform(int index);
 
@@ -40,7 +40,7 @@ namespace OpenEngine {
 
 	TransformationNode * trans;
 
-	Geometry * childShape;
+	GeometryBase * childShape;
 	
       };
 

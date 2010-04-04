@@ -31,7 +31,7 @@ namespace OpenEngine {
     
     void PhysicsFacade::Handle(ProcessEventArg arg)
     {
-      float deltaTime = arg.approx / 1000.0;
+        float deltaTime = arg.approx;// / 1000.0;
       physEngine->Process(deltaTime);
     }
     

@@ -31,23 +31,16 @@ using std::vector;
  *
  * @class Box Box.h Geometry/Box.h
  */
- class AABB : public BoundingGeometry, public Geometry {
+ class AABB : public BoundingGeometry, public GeometryBase {
 
-friend class Geometry;
+friend class GeometryBase;
     
 private:
     
     Vector<3,float> center;     //!< Box center
     Vector<3,float> corner;     //!< Box corner (relative)
 
-    friend class boost::serialization::access;
-    template<class Archive>
-    void serialize(Archive & ar, const unsigned int version)
-    {
-        ar & center;
-        ar & corner;
-    }
-
+    
 
 public:
     AABB() {}; // empty constructor for serialization

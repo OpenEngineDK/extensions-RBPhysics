@@ -10,20 +10,20 @@ namespace OpenEngine {
       children = vector<CompoundShapeChild>();
     }
 
-    void CompoundShape::addChildShape(TransformationNode * trans, Geometry * childShape) {
-      CompoundShapeChild child;
-      child.trans = trans;
-      child.childShape = childShape;
-      children.push_back(child);
+    void CompoundShape::addChildShape(TransformationNode * trans, GeometryBase * childShape) {
+        CompoundShapeChild child;
+        child.trans = trans;
+        child.childShape = childShape;
+        children.push_back(child);
     }
 
 
       int CompoundShape::getNumChildShapes()
       {
-	return children.size();
+          return children.size();
       }
 
-      Geometry * CompoundShape::getChildShape(int index)
+      GeometryBase * CompoundShape::getChildShape(int index)
       {
 	return children[index].childShape;
       }

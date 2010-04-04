@@ -2,7 +2,7 @@
 # define   	HEIGHTFIELDTERRAINSHAPE_H_
 
 #include <Geometry/Geometry.h>
-#include <Resources/ITextureResource.h>
+#include <Resources/Texture2D.h>
 #include <string>
 #include <vector>
 #include <Math/Vector.h>
@@ -13,6 +13,7 @@ namespace OpenEngine {
 
     using OpenEngine::Math::Vector;
     using std::vector;
+      using namespace Resources;
 
       /**
        * HeightFieldTerrainShape
@@ -29,18 +30,22 @@ namespace OpenEngine {
        *
        */
 
-    class HeightfieldTerrainShape : public Geometry {
+    class HeightfieldTerrainShape : public GeometryBase {
 
     public:
 
       HeightfieldTerrainShape() {}; // empty constructor for serialization
 
-      explicit HeightfieldTerrainShape(OpenEngine::Resources::ITextureResourcePtr tex, 
-				       float maxHeight, float scaling, int upAxis, bool useFloatData, bool flipQuadEdges);
+        explicit HeightfieldTerrainShape(FloatTexture2DPtr tex, 
+                                         float maxHeight, 
+                                         float scaling,
+                                         int upAxis,
+                                         bool useFloatData, 
+                                         bool flipQuadEdges);
 
       float GetHeightFieldValue(int x, int y);
 
-      OpenEngine::Resources::ITextureResourcePtr GetTextureResource();
+      FloatTexture2DPtr GetTextureResource();
 
       float GetMaxHeight();
 
@@ -56,7 +61,7 @@ namespace OpenEngine {
     private:
 
   //      OpenEngine::Resources::ITextureResource * tex;
-      OpenEngine::Resources::ITextureResourcePtr tex;
+      FloatTexture2DPtr tex;
       float maxHeight, scaling;
       int upAxis;
       bool useFloatData, flipQuadEdges;

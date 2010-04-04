@@ -1,6 +1,6 @@
 #include <Bullet/DebugDrawer.h>
 
-#include <LinearMath/btPoint3.h>
+#include <LinearMath/btVector3.h>
 #include <Bullet/Util.h>
 #include <Geometry/Line.h>
 #include <Geometry/Face.h>
@@ -17,7 +17,10 @@ DebugDrawer::DebugDrawer(OpenEngine::Renderers::IRenderer * renderer)
 }
 inline void	DebugDrawer::drawLine(const btVector3& from,const btVector3& to,const btVector3& color)
 {
-    renderer->DrawLine(Line(toOEVec(from),toOEVec(to)),toOEVec(color));
+    Line l(toOEVec(from),toOEVec(to));
+    // logger.info << "Line: " << l.point1 << " " 
+    //             << l.point1 << logger.end;
+    renderer->DrawLine(l,toOEVec(color));
 }
 
 void DebugDrawer::drawTriangle(const btVector3& v0,const btVector3& v1,const btVector3& v2,
@@ -33,7 +36,11 @@ void DebugDrawer::drawTriangle(const btVector3& v0,const btVector3& v1,const btV
   renderer->DrawLine(Line(p2,p0),c);
 }
 
-inline void DebugDrawer::drawTriangle(const btVector3& v0,const btVector3& v1,const btVector3& v2,const btVector3& color, btScalar alpha) 
+inline void DebugDrawer::drawTriangle(const btVector3& v0,
+                                      const btVector3& v1,
+                                      const btVector3& v2,
+                                      const btVector3& color,
+                                      btScalar alpha) 
 {
   p0 = toOEVec(v0);
   p1 = toOEVec(v1);

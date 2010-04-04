@@ -6,10 +6,10 @@
 namespace OpenEngine {
 namespace Geometry {
 
-class Geometry {
+class GeometryBase {
  public:
-    Geometry() {}
-    virtual ~Geometry() {}
+    GeometryBase() {}
+    virtual ~GeometryBase() {}
 };
 
 } // NS Geometry

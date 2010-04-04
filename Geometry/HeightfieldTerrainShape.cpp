@@ -6,7 +6,7 @@ namespace OpenEngine {
 
 
 
-    HeightfieldTerrainShape::HeightfieldTerrainShape(OpenEngine::Resources::ITextureResourcePtr tex,
+    HeightfieldTerrainShape::HeightfieldTerrainShape(FloatTexture2DPtr tex,
 						     float maxHeight, float scaling, int upAxis,
 						     bool useFloatData, bool flipQuadEdges) 
       : tex(tex), maxHeight(maxHeight), scaling(scaling), upAxis(upAxis),
@@ -23,7 +23,7 @@ namespace OpenEngine {
     }
 
 
-    OpenEngine::Resources::ITextureResourcePtr HeightfieldTerrainShape::GetTextureResource()
+    FloatTexture2DPtr HeightfieldTerrainShape::GetTextureResource()
     {
       return tex;
     }

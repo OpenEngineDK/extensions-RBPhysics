@@ -39,7 +39,7 @@ namespace OpenEngine {
       body->SetRotation(rot);
     }
     
-    OpenEngine::Geometry::Geometry * RigidBodyDecorator::GetShape() 
+    OpenEngine::Geometry::GeometryBase * RigidBodyDecorator::GetShape() 
     {
       return body->GetShape();
     }

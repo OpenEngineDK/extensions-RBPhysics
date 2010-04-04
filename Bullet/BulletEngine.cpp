@@ -162,7 +162,10 @@ namespace OpenEngine
         //logger.info << turnPercent << logger.end;
       }
 
-      m_dynamicsWorld->stepSimulation(1.0f/deltaTime,1);
+      float sec = deltaTime/100000.0;
+      //logger.info << sec << logger.end;
+
+      m_dynamicsWorld->stepSimulation(sec, 4);
 
       for(list< BodyPair >::iterator it = bodies.begin();
           it != bodies.end(); it++) {
@@ -473,7 +476,7 @@ namespace OpenEngine
       return body;
     }
 
-    btCollisionShape * BulletEngine::ConvertShape(OpenEngine::Geometry::Geometry * geom)
+    btCollisionShape * BulletEngine::ConvertShape(OpenEngine::Geometry::GeometryBase * geom)
     {
       
       if(typeid(Sphere) == typeid(*geom)) {
@@ -507,7 +510,7 @@ namespace OpenEngine
         CompoundShape * compound = dynamic_cast<CompoundShape*>(geom);
         btCompoundShape * cShape = new btCompoundShape();
         for(int i = 0; i < compound->getNumChildShapes(); i++) {	  
-          OpenEngine::Geometry::Geometry * shape = compound->getChildShape(i);
+          OpenEngine::Geometry::GeometryBase * shape = compound->getChildShape(i);
           TransformationNode * tn = compound->getChildTransform(i);
           btCollisionShape * collShape = ConvertShape(shape);
           btTransform * btTrans = new btTransform(toBtQuat(tn->GetRotation()), toBtVec(tn->GetPosition()));
@@ -517,15 +520,18 @@ namespace OpenEngine
       }
       else if(typeid(HeightfieldTerrainShape) == typeid(*geom)) {
         HeightfieldTerrainShape * hts = dynamic_cast<HeightfieldTerrainShape*>(geom);
-        ITextureResourcePtr tex = hts->GetTextureResource();
-        cout << "tex: " << tex->GetWidth() << tex->GetHeight() << endl;
-        btHeightfieldTerrainShape * bhts = new btHeightfieldTerrainShape(tex->GetWidth(),
-                                                                         tex->GetHeight(),
-                                                                         tex->GetData(),
-                                                                         hts->GetMaxHeight(),
-                                                                         hts->GetUpAxis(),
-                                                                         hts->UsesFloatData(),
-                                                                         hts->FlippedQuadEdges() );
+        FloatTexture2DPtr tex = hts->GetTextureResource();
+        logger.info << "tex: " << tex->GetWidth() << "x" << tex->GetHeight() << logger.end;
+        btHeightfieldTerrainShape * bhts 
+            = new btHeightfieldTerrainShape(tex->GetWidth(),
+                                            tex->GetHeight(),
+                                            tex->GetData(),
+                                            1,
+                                            0,
+                                            hts->GetMaxHeight(),
+                                            hts->GetUpAxis(),
+                                            hts->UsesFloatData()?PHY_FLOAT:PHY_UCHAR,
+                                            hts->FlippedQuadEdges() );
         bhts->setUseDiamondSubdivision(true);
         float scaling = hts->GetScaling();
         btVector3 localScaling(scaling, scaling, scaling);

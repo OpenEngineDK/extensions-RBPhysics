@@ -20,7 +20,7 @@ namespace OpenEngine {
     using namespace OpenEngine::Scene;
     using std::vector;
 
-    class TriangleMesh : public Geometry {
+    class TriangleMesh : public GeometryBase {
 
     public:
 

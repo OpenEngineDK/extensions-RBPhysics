@@ -60,7 +60,7 @@ namespace OpenEngine {
        *
        * @retrun The shape of the rigid body
        */
-      virtual OpenEngine::Geometry::Geometry * GetShape() = 0;
+      virtual OpenEngine::Geometry::GeometryBase * GetShape() = 0;
 
       /**
        * Get the name of the body

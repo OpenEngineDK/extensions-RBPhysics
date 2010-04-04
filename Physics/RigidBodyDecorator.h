@@ -25,7 +25,7 @@ namespace OpenEngine {
       OpenEngine::Scene::TransformationNode * GetTransformationNode();
       void SetPosition(OpenEngine::Math::Vector<3,float> pos);
       void SetRotation(OpenEngine::Math::Quaternion<float> rot);
-      OpenEngine::Geometry::Geometry * GetShape();
+      OpenEngine::Geometry::GeometryBase * GetShape();
       const std::string & GetName() const;
       void SetName(const std::string & name);
 

@@ -8,29 +8,31 @@
 
 STRING(COMPARE EQUAL ${CMAKE_BUILD_TYPE} "debug" ISDEBUGENABLED)
 
-IF(ISDEBUGENABLED)
-  SET(BULLETDYNAMICS "bulletdynamics-d")
-  SET(BULLETCOLLISION "bulletcollision-d")
-  SET(BULLETMATH "bulletmath-d")
-  SET(BULLETSOFTBODY "bulletsoftbody-d")  
-ELSE(ISDEBUGENABLED)
+# IF(ISDEBUGENABLED)
+#   SET(BULLETDYNAMICS "bulletdynamics-d")
+#   SET(BULLETCOLLISION "bulletcollision-d")
+#   SET(BULLETMATH "bulletmath-d")
+#   SET(BULLETSOFTBODY "bulletsoftbody-d")  
+# ELSE(ISDEBUGENABLED)
   SET(BULLETDYNAMICS "bulletdynamics")
   SET(BULLETCOLLISION "bulletcollision")
-  SET(BULLETMATH "bulletmath")
+  SET(BULLETMATH "linearmath")
   SET(BULLETSOFTBODY "bulletsoftbody")  
-ENDIF(ISDEBUGENABLED)
+# ENDIF(ISDEBUGENABLED)
 
 FIND_PATH(BULLET_INCLUDE_DIR NAMES btBulletCollisionCommon.h btBulletCollisionCommon.h
   PATHS
   ${PROJECT_BINARY_DIR}/include
   ${PROJECT_SOURCE_DIR}/include
-  ${PROJECT_SOURCE_DIR}/libraries/bullet2.70/include
+  ${PROJECT_SOURCE_DIR}/libraries/bullet-2.76/src
   ENV CPATH
   /usr/include
   /usr/local/include
   /opt/local/include
   NO_DEFAULT_PATH
 )
+
+MESSAGE("${BULLET_INCLUDE_DIR}")
 
 FIND_LIBRARY(LIBBULLETDYNAMICS
   NAMES 
@@ -39,9 +41,7 @@ FIND_LIBRARY(LIBBULLETDYNAMICS
   ${PROJECT_BINARY_DIR}/lib
   ${PROJECT_SOURCE_DIR}/lib
   ${PROJECT_SOURCE_DIR}/libraries
-  ${PROJECT_SOURCE_DIR}/libraries/bullet2.70/lib
-  ${PROJECT_SOURCE_DIR}/libraries/bullet2.70/lib/linux
-  ${PROJECT_SOURCE_DIR}/libraries/bullet2.70/lib/mac-i32
+  ${PROJECT_SOURCE_DIR}/libraries/bullet-2.76/src/BulletDynamics
   ENV LD_LIBRARY_PATH
   ENV LIBRARY_PATH
   /usr/lib
@@ -49,6 +49,9 @@ FIND_LIBRARY(LIBBULLETDYNAMICS
   /opt/local/lib
   NO_DEFAULT_PATH
 )
+
+MESSAGE("${LIBBULLETDYNAMICS}")
+
 
 IF(NOT LIBBULLETDYNAMICS)
   MESSAGE ("WARNING: Could not find bullet dynamics - depending targets will be disabled.")
@@ -62,9 +65,7 @@ FIND_LIBRARY(LIBBULLETCOLLISION
   ${PROJECT_BINARY_DIR}/lib
   ${PROJECT_SOURCE_DIR}/lib
   ${PROJECT_SOURCE_DIR}/libraries
-  ${PROJECT_SOURCE_DIR}/libraries/bullet2.70/lib
-  ${PROJECT_SOURCE_DIR}/libraries/bullet2.70/lib/linux
-  ${PROJECT_SOURCE_DIR}/libraries/bullet2.70/lib/mac-i32
+  ${PROJECT_SOURCE_DIR}/libraries/bullet-2.76/src/BulletCollision
   ENV LD_LIBRARY_PATH
   ENV LIBRARY_PATH
   /usr/lib
@@ -84,9 +85,7 @@ FIND_LIBRARY(LIBBULLETMATH
   ${PROJECT_BINARY_DIR}/lib
   ${PROJECT_SOURCE_DIR}/lib
   ${PROJECT_SOURCE_DIR}/libraries
-  ${PROJECT_SOURCE_DIR}/libraries/bullet2.70/lib
-  ${PROJECT_SOURCE_DIR}/libraries/bullet2.70/lib/linux
-  ${PROJECT_SOURCE_DIR}/libraries/bullet2.70/lib/mac-i32
+  ${PROJECT_SOURCE_DIR}/libraries/bullet-2.76/src/LinearMath
   ENV LD_LIBRARY_PATH
   ENV LIBRARY_PATH
   /usr/lib
@@ -106,9 +105,7 @@ FIND_LIBRARY(LIBBULLETSOFTBODY
   ${PROJECT_BINARY_DIR}/lib
   ${PROJECT_SOURCE_DIR}/lib
   ${PROJECT_SOURCE_DIR}/libraries
-  ${PROJECT_SOURCE_DIR}/libraries/bullet2.70/lib
-  ${PROJECT_SOURCE_DIR}/libraries/bullet2.70/lib/linux
-  ${PROJECT_SOURCE_DIR}/libraries/bullet2.70/lib/mac-i32
+  ${PROJECT_SOURCE_DIR}/libraries/bullet-2.76/src/BulletSoftBody
   ENV LD_LIBRARY_PATH
   ENV LIBRARY_PATH
   /usr/lib
