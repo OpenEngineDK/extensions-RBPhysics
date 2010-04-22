@@ -6,6 +6,7 @@
 #include <list>
 #include <Geometry/Geometry.h>
 #include <boost/tuple/tuple.hpp>
+#include <Utils/Timer.h>
 
 class btRigidBody;
 class btRaycastVehicle;
@@ -72,6 +73,7 @@ namespace OpenEngine
 
           std::list< BodyPair > bodies;
           std::list< CarPair > cars;
+        Utils::Timer timer;
   
           btRigidBody* localCreateRigidBody(float mass,
 					    const btTransform& startTransform,

@@ -19,6 +19,8 @@
 #include <Bullet/BulletRayResultCallback.h>
 #include <BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
 #include <btBulletDynamicsCommon.h>
+#include <Resources/DataBlock.h>
+
 
 using OpenEngine::Core::NotImplemented;
 using namespace OpenEngine::Physics;
@@ -53,6 +55,7 @@ namespace OpenEngine
       m_dynamicsWorld = world;
 
       m_dynamicsWorld->setGravity(toBtVec(gravity));
+      timer.Start();
     }
 
     BulletEngine::~BulletEngine() {
@@ -161,11 +164,12 @@ namespace OpenEngine
         }
         //logger.info << turnPercent << logger.end;
       }
-
+      
       float sec = deltaTime/100000.0;
+      sec = timer.GetElapsedTimeAndReset().AsInt()/100000.0;
       //logger.info << sec << logger.end;
 
-      m_dynamicsWorld->stepSimulation(sec, 4);
+      m_dynamicsWorld->stepSimulation(sec, 10);
 
       for(list< BodyPair >::iterator it = bodies.begin();
           it != bodies.end(); it++) {
@@ -520,12 +524,32 @@ namespace OpenEngine
       }
       else if(typeid(HeightfieldTerrainShape) == typeid(*geom)) {
         HeightfieldTerrainShape * hts = dynamic_cast<HeightfieldTerrainShape*>(geom);
-        FloatTexture2DPtr tex = hts->GetTextureResource();
-        logger.info << "tex: " << tex->GetWidth() << "x" << tex->GetHeight() << logger.end;
+        //FloatTexture2DPtr tex = hts->GetTextureResource();
+        IDataBlockPtr blk = hts->GetDataBlock();
+        //logger.info << "tex: " << tex->GetWidth() << "x" << tex->GetHeight() << logger.end;
+        
+        int w = hts->GetWidth();
+        int d = hts->GetDepth();
+
+        float *input = (float*)blk->GetVoidDataPtr();
+
+        float *arr = new float[w * d]; 
+
+        // Magic indexing :-)
+        for (int x=0;x<w;x++) {
+            for (int y=0;y<d;y++) {
+                int idx = x*w + y;
+                int idy = (w-1-x)*w*4+y*4+1;
+                arr[idx] = input[idy];
+                logger.info << arr[idx] << logger.end;
+            }
+        }
+
+        
         btHeightfieldTerrainShape * bhts 
-            = new btHeightfieldTerrainShape(tex->GetWidth(),
-                                            tex->GetHeight(),
-                                            tex->GetData(),
+            = new btHeightfieldTerrainShape(w,
+                                            d,
+                                            arr,
                                             1,
                                             0,
                                             hts->GetMaxHeight(),
@@ -537,6 +561,8 @@ namespace OpenEngine
         btVector3 localScaling(scaling, scaling, scaling);
         localScaling[hts->GetUpAxis()]=1.f;
         bhts->setLocalScaling(localScaling);
+
+        //delete[] arr; // Will it be copied? - I think not
 
         return bhts;
 	

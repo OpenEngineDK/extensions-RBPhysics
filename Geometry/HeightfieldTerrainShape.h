@@ -3,6 +3,7 @@
 
 #include <Geometry/Geometry.h>
 #include <Resources/Texture2D.h>
+#include <Resources/IDataBlock.h>
 #include <string>
 #include <vector>
 #include <Math/Vector.h>
@@ -36,7 +37,9 @@ namespace OpenEngine {
 
       HeightfieldTerrainShape() {}; // empty constructor for serialization
 
-        explicit HeightfieldTerrainShape(FloatTexture2DPtr tex, 
+        explicit HeightfieldTerrainShape(IDataBlockPtr blk,
+                                         int width,
+                                         int depth,
                                          float maxHeight, 
                                          float scaling,
                                          int upAxis,
@@ -45,7 +48,11 @@ namespace OpenEngine {
 
       float GetHeightFieldValue(int x, int y);
 
-      FloatTexture2DPtr GetTextureResource();
+        //FloatTexture2DPtr GetTextureResource();
+      IDataBlockPtr GetDataBlock();
+
+      int GetWidth();
+      int GetDepth();
 
       float GetMaxHeight();
 
@@ -61,7 +68,8 @@ namespace OpenEngine {
     private:
 
   //      OpenEngine::Resources::ITextureResource * tex;
-      FloatTexture2DPtr tex;
+      IDataBlockPtr block;
+        int width,depth;
       float maxHeight, scaling;
       int upAxis;
       bool useFloatData, flipQuadEdges;

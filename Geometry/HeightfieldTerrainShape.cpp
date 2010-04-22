@@ -6,28 +6,42 @@ namespace OpenEngine {
 
 
 
-    HeightfieldTerrainShape::HeightfieldTerrainShape(FloatTexture2DPtr tex,
-						     float maxHeight, float scaling, int upAxis,
-						     bool useFloatData, bool flipQuadEdges) 
-      : tex(tex), maxHeight(maxHeight), scaling(scaling), upAxis(upAxis),
+    HeightfieldTerrainShape::HeightfieldTerrainShape(IDataBlockPtr block,
+                                                     int width,
+                                                     int depth,
+                                                     float maxHeight,
+                                                     float scaling,
+                                                     int upAxis,
+                                                     bool useFloatData, 
+                                                     bool flipQuadEdges) 
+        : block(block), 
+          width(width),
+          depth(depth),
+          maxHeight(maxHeight), scaling(scaling), upAxis(upAxis),
 	useFloatData(useFloatData), flipQuadEdges(flipQuadEdges)
     {
-      tex->Load();
+      
     }
 
 
     float HeightfieldTerrainShape::GetHeightFieldValue(int x, int y)
     {
       // is this correct?
-      return tex->GetData()[x * tex->GetWidth() + y] * maxHeight;
+        return 0;
+        //return tex->GetData()[x * tex->GetWidth() + y] * maxHeight;
     }
 
 
-    FloatTexture2DPtr HeightfieldTerrainShape::GetTextureResource()
-    {
-      return tex;
-    }
+    // FloatTexture2DPtr HeightfieldTerrainShape::GetTextureResource()
+    // {
+    //   return tex;
+    // }
 
+
+      int HeightfieldTerrainShape::GetWidth() { return width; }
+      int HeightfieldTerrainShape::GetDepth() { return depth; }
+
+      IDataBlockPtr HeightfieldTerrainShape::GetDataBlock() { return block; }
 
     float HeightfieldTerrainShape::GetMaxHeight()
     {
