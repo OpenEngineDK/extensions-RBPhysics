@@ -12,6 +12,8 @@
 
 #include "RigidBody.h"
 
+#include <cstdlib> //for rand
+
 namespace OpenEngine {
 
 using namespace Math;
