@@ -25,8 +25,6 @@ FIND_PATH(BULLET_INCLUDE_DIR NAMES btBulletCollisionCommon.h btBulletCollisionCo
   NO_DEFAULT_PATH
 )
 
-MESSAGE("${BULLET_INCLUDE_DIR}")
-
 FIND_LIBRARY(LIBBULLETDYNAMICS
   NAMES 
   ${BULLETDYNAMICS}
@@ -42,9 +40,6 @@ FIND_LIBRARY(LIBBULLETDYNAMICS
   /opt/local/lib
   NO_DEFAULT_PATH
 )
-
-MESSAGE("${LIBBULLETDYNAMICS}")
-
 
 IF(NOT LIBBULLETDYNAMICS)
   MESSAGE ("WARNING: Could not find bullet dynamics - depending targets will be disabled.")
