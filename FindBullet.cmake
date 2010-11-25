@@ -8,23 +8,16 @@
 
 STRING(COMPARE EQUAL ${CMAKE_BUILD_TYPE} "debug" ISDEBUGENABLED)
 
-# IF(ISDEBUGENABLED)
-#   SET(BULLETDYNAMICS "bulletdynamics-d")
-#   SET(BULLETCOLLISION "bulletcollision-d")
-#   SET(BULLETMATH "bulletmath-d")
-#   SET(BULLETSOFTBODY "bulletsoftbody-d")  
-# ELSE(ISDEBUGENABLED)
-  SET(BULLETDYNAMICS "bulletdynamics")
-  SET(BULLETCOLLISION "bulletcollision")
-  SET(BULLETMATH "linearmath")
-  SET(BULLETSOFTBODY "bulletsoftbody")  
-# ENDIF(ISDEBUGENABLED)
+  SET(BULLETDYNAMICS "BulletDynamics")
+  SET(BULLETCOLLISION "BulletCollision")
+  SET(BULLETMATH "LinearMath")
+  SET(BULLETSOFTBODY "BulletSoftBody")  
 
 FIND_PATH(BULLET_INCLUDE_DIR NAMES btBulletCollisionCommon.h btBulletCollisionCommon.h
   PATHS
   ${PROJECT_BINARY_DIR}/include
   ${PROJECT_SOURCE_DIR}/include
-  ${PROJECT_SOURCE_DIR}/libraries/bullet-2.76/src
+  ${PROJECT_SOURCE_DIR}/libraries/bullet/include
   ENV CPATH
   /usr/include
   /usr/local/include
@@ -41,7 +34,7 @@ FIND_LIBRARY(LIBBULLETDYNAMICS
   ${PROJECT_BINARY_DIR}/lib
   ${PROJECT_SOURCE_DIR}/lib
   ${PROJECT_SOURCE_DIR}/libraries
-  ${PROJECT_SOURCE_DIR}/libraries/bullet-2.76/src/BulletDynamics
+  ${PROJECT_SOURCE_DIR}/libraries/bullet/lib
   ENV LD_LIBRARY_PATH
   ENV LIBRARY_PATH
   /usr/lib
@@ -65,7 +58,7 @@ FIND_LIBRARY(LIBBULLETCOLLISION
   ${PROJECT_BINARY_DIR}/lib
   ${PROJECT_SOURCE_DIR}/lib
   ${PROJECT_SOURCE_DIR}/libraries
-  ${PROJECT_SOURCE_DIR}/libraries/bullet-2.76/src/BulletCollision
+  ${PROJECT_SOURCE_DIR}/libraries/bullet/lib
   ENV LD_LIBRARY_PATH
   ENV LIBRARY_PATH
   /usr/lib
@@ -85,7 +78,7 @@ FIND_LIBRARY(LIBBULLETMATH
   ${PROJECT_BINARY_DIR}/lib
   ${PROJECT_SOURCE_DIR}/lib
   ${PROJECT_SOURCE_DIR}/libraries
-  ${PROJECT_SOURCE_DIR}/libraries/bullet-2.76/src/LinearMath
+  ${PROJECT_SOURCE_DIR}/libraries/bullet/lib
   ENV LD_LIBRARY_PATH
   ENV LIBRARY_PATH
   /usr/lib
@@ -105,7 +98,7 @@ FIND_LIBRARY(LIBBULLETSOFTBODY
   ${PROJECT_BINARY_DIR}/lib
   ${PROJECT_SOURCE_DIR}/lib
   ${PROJECT_SOURCE_DIR}/libraries
-  ${PROJECT_SOURCE_DIR}/libraries/bullet-2.76/src/BulletSoftBody
+  ${PROJECT_SOURCE_DIR}/libraries/bullet/lib
   ENV LD_LIBRARY_PATH
   ENV LIBRARY_PATH
   /usr/lib
@@ -129,5 +122,3 @@ ENDIF(BULLET_INCLUDE_DIR AND BULLET_LIBRARIES)
 IF(BULLET_FOUND)
   MARK_AS_ADVANCED(BULLET_INCLUDE_DIR BULLET_DOM_LIBRARIES )
 ENDIF(BULLET_FOUND)
-
-
