@@ -25,32 +25,30 @@ class TriangleMesh : public GeometryBase
 {
 public:
 	TriangleMesh(){}; // empty constructor for serialization
-
     explicit TriangleMesh(ISceneNode* node);
 
-	Resources::IDataBlockPtr GetVertices()
+	~TriangleMesh();
+
+	MeshNode* GetMesh(int i)
 	{
-		return Vertices;
+		return (*meshs)[i];
 	}
 
-	IndicesPtr GetIndices()
+	unsigned int GetSize()
 	{
-		return Indices;
+		return meshs->size();
 	}
-
 private:
-	Resources::IDataBlockPtr Vertices;
-	IndicesPtr Indices;
+	std::vector<MeshNode*> *meshs;
 
     class GeometryCollector : public ISceneNodeVisitor
 	{
     private:
-		Resources::IDataBlockPtr Vertices;
-		IndicesPtr Indices;
- 
+		std::vector<MeshNode*> *meshs;
 	public:
 		GeometryCollector(ISceneNode* node)
 		{
+			meshs=new std::vector<MeshNode*>();
 	  		node->Accept(*this);
 		}
     
@@ -58,26 +56,16 @@ private:
     
 		void VisitMeshNode(MeshNode* node)
 		{
-			//Tjek form, vha getType på meshNode
-			//Add support for more than one meshNode	
-			
-			Vertices = node->GetMesh()->GetGeometrySet()->GetVertices();
-			Indices = node->GetMesh()->GetIndices();
-		}
-     
-		Resources::IDataBlockPtr GetVertices()
-		{
-			return Vertices;
+			meshs->push_back(node);	
 		}
 
-		IndicesPtr GetIndices()
+		std::vector<MeshNode*>* GetMeshes()
 		{
-			return Indices;
+			return meshs;
 		}
 	}; // FaceCollector
 }; //TriangleMesh
 
 }}
-
 
 #endif 	    /* !TRIANGLEMESH_H_ */

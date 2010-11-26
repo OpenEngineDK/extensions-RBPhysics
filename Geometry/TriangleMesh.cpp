@@ -13,8 +13,12 @@ namespace Geometry {
     TriangleMesh::TriangleMesh(ISceneNode* node)
 	{
     	GeometryCollector gc(node);
-    	Vertices=gc.GetVertices();
-		Indices=gc.GetIndices();
+    	meshs = gc.GetMeshes();
+	}
+
+	TriangleMesh::~TriangleMesh()
+	{
+		delete meshs;
 	}
 }}
 
