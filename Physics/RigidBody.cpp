@@ -17,11 +17,10 @@ namespace OpenEngine {
       shape(shape),
       name("")
     {
-      
     }
 
-    RigidBody::~RigidBody() {
-
+    RigidBody::~RigidBody()
+	{
     }
 
     Vector<3,float> RigidBody::GetPosition() {

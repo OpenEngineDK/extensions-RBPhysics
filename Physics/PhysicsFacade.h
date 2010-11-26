@@ -32,7 +32,7 @@ namespace OpenEngine {
     class PhysicsFacade : public Core::IModule {
     public:
 
-      PhysicsFacade(OpenEngine::Geometry::AABB & worldAabb, OpenEngine::Math::Vector<3,float> gravity);
+      PhysicsFacade(OpenEngine::Geometry::AABB &worldAabb, OpenEngine::Math::Vector<3,float> gravity);
 
       // Methods inherited from IModule
 

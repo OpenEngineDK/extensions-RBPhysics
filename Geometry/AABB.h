@@ -40,8 +40,6 @@ private:
     Vector<3,float> center;     //!< Box center
     Vector<3,float> corner;     //!< Box corner (relative)
 
-    
-
 public:
     AABB() {}; // empty constructor for serialization
 

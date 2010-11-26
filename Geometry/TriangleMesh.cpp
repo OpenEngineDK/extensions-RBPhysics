@@ -5,29 +5,18 @@
 #include <Geometry/Plane.h>
 #include <Core/Exceptions.h>
 
-
 namespace OpenEngine {
-  namespace Geometry {
+namespace Geometry {
 
     using OpenEngine::Math::Vector;
 
-    TriangleMesh::TriangleMesh(FaceSet& faces) : faces(&faces) {
-
-    }
-
-
-    TriangleMesh::TriangleMesh(ISceneNode& node) {
-    
-      FaceCollector fc(node);
-      faces = fc.GetFaceSet();
-
-    }
-
-    FaceSet * TriangleMesh::GetFaceSet() {
-      return faces;
-    }
-  }
-}
+    TriangleMesh::TriangleMesh(ISceneNode* node)
+	{
+    	GeometryCollector gc(node);
+    	Vertices=gc.GetVertices();
+		Indices=gc.GetIndices();
+	}
+}}
 
 
 

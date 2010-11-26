@@ -493,23 +493,41 @@ namespace OpenEngine
         Vector<3,float> size = box.GetCorner();
         return new btBoxShape (toBtVec(size));
       }
-      else if(typeid(TriangleMesh) == typeid(*geom)) {
-        TriangleMesh * triangleMesh = dynamic_cast<TriangleMesh* >(geom);
-        FaceSet * faces = triangleMesh->GetFaceSet();
-        btTriangleMesh * triMesh = new btTriangleMesh();
-        // fill triangle mesh with faces from the static geometry
-        for(FaceList::iterator it = faces->begin(); it != faces->end(); it++) {
-          FacePtr tmp = (FacePtr)*it;
-          triMesh->addTriangle(toBtVec(tmp->vert[0]), toBtVec(tmp->vert[1]), toBtVec(tmp->vert[2]));
-        }
-        //cout << "NumTriangles in triangleMesh: " << triMesh.getNumTriangles() << std::endl;
-        // make a new triangle mesh shape
+      else if(typeid(TriangleMesh) == typeid(*geom))
+	  {
+        TriangleMesh* triangleMesh = dynamic_cast<TriangleMesh*>(geom);
+       	Resources::IDataBlockPtr Vertices = triangleMesh->GetVertices();
+		IndicesPtr Indices = triangleMesh->GetIndices();
+
+		btTriangleMesh* triMesh = new btTriangleMesh();
+	
+		for(unsigned int x=0; x<Indices->GetSize(); x+=3)
+		{
+			Math::Vector<3, float> vec1;
+			Math::Vector<3, float> vec2;
+			Math::Vector<3, float> vec3;
+
+			Vertices->GetElement(Indices->GetElement(x)[0], vec1);
+			Vertices->GetElement(Indices->GetElement(x+1)[0], vec2);
+			Vertices->GetElement(Indices->GetElement(x+2)[0], vec3);
+
+			triMesh->addTriangle(toBtVec(vec1), toBtVec(vec2), toBtVec(vec3));
+		}
+
+		//cout << "NumTriangles in triangleMesh: " << triMesh->getNumTriangles() << std::endl;
+        
+		#if OE_SAFE
+        if(triMesh->getNumTriangles()==0)
+		    throw Exception("ERROR SETTING PHYSICS");
+		#endif
+		
+		  // make a new triangle mesh shape
         bool useQuantizedBvhTree = true;
         btCollisionShape* shape = NULL;
         shape = new btBvhTriangleMeshShape(triMesh, useQuantizedBvhTree);
         ((btBvhTriangleMeshShape*)shape)->recalcLocalAabb(); // do we need to do this?
         return shape;
-      }
+	}
       else if(typeid(CompoundShape) == typeid(*geom)) {
         CompoundShape * compound = dynamic_cast<CompoundShape*>(geom);
         btCompoundShape * cShape = new btCompoundShape();
