@@ -48,10 +48,10 @@ namespace OpenEngine
       m_solver = new btSequentialImpulseConstraintSolver();
 
       btDiscreteDynamicsWorld* world =
-	new btDiscreteDynamicsWorld(m_dispatcher,
-				    m_broadphase,
-				    m_solver,
-				    m_collisionConfiguration);
+    new btDiscreteDynamicsWorld(m_dispatcher,
+                    m_broadphase,
+                    m_solver,
+                    m_collisionConfiguration);
       m_dynamicsWorld = world;
 
       m_dynamicsWorld->setGravity(toBtVec(gravity));
@@ -69,145 +69,145 @@ namespace OpenEngine
 
     void BulletEngine::Process(const float deltaTime) 
     {
-		for(list< BodyPair >::iterator it = bodies.begin(); it != bodies.end(); it++)
-	  	{
-        	IRigidBody & oeBody = *(*it).get<0>();
-        	btRigidBody & btBody = *(*it).get<1>();
+        for(list< BodyPair >::iterator it = bodies.begin(); it != bodies.end(); it++)
+        {
+            IRigidBody & oeBody = *(*it).get<0>();
+            btRigidBody & btBody = *(*it).get<1>();
 
-        	if(typeid(DynamicBody) == typeid(oeBody))
-			{
-          		DynamicBody & dynBody = *dynamic_cast<DynamicBody*>((*it).get<0>());
+            if(typeid(DynamicBody) == typeid(oeBody))
+            {
+                DynamicBody & dynBody = *dynamic_cast<DynamicBody*>((*it).get<0>());
           
-          		// change body state:
-          		if(dynBody.IsStateChanged())
-				{
-            		btBody.setDamping(dynBody.GetLinearDamping() ,
-                               		  dynBody.GetAngularDamping());
+                // change body state:
+                if(dynBody.IsStateChanged())
+                {
+                    btBody.setDamping(dynBody.GetLinearDamping() ,
+                                      dynBody.GetAngularDamping());
             
-            		if(dynBody.IsDisableDeactivation())
-					{
-              			btBody.setActivationState(DISABLE_DEACTIVATION); // how to switch this off???
-            		}
+                    if(dynBody.IsDisableDeactivation())
+                    {
+                        btBody.setActivationState(DISABLE_DEACTIVATION); // how to switch this off???
+                    }
 
-            		btTransform trans;
-            		trans.setIdentity();
-            		trans.setRotation(toBtQuat(dynBody.GetRotation()));
-            		trans.setOrigin(toBtVec(dynBody.GetPosition()));
+                    btTransform trans;
+                    trans.setIdentity();
+                    trans.setRotation(toBtQuat(dynBody.GetRotation()));
+                    trans.setOrigin(toBtVec(dynBody.GetPosition()));
             
-            		btMotionState* myMotionState = btBody.getMotionState();
-            		myMotionState->setWorldTransform(trans);
-            		btBody.setMotionState(myMotionState);
+                    btMotionState* myMotionState = btBody.getMotionState();
+                    myMotionState->setWorldTransform(trans);
+                    btBody.setMotionState(myMotionState);
 
-            		btBody.setLinearVelocity(toBtVec(dynBody.GetLinearVelocity()));
-            		btBody.setAngularVelocity(toBtVec(dynBody.GetAngularVelocity()));
-          		}
+                    btBody.setLinearVelocity(toBtVec(dynBody.GetLinearVelocity()));
+                    btBody.setAngularVelocity(toBtVec(dynBody.GetAngularVelocity()));
+                }
 
-          		// apply forces:
-          		btBody.clearForces();
-          		btBody.applyTorque(toBtVec(dynBody.GetTorque()));
+                // apply forces:
+                btBody.clearForces();
+                btBody.applyTorque(toBtVec(dynBody.GetTorque()));
 
-          		for(list<DynamicBody::ForceAtPosition>::iterator it = dynBody.GetForces().begin(); it != dynBody.GetForces().end(); it++)
-				{
-            		DynamicBody::ForceAtPosition & f = *it;
-            		btBody.applyForce(toBtVec(f.get<0>()),toBtVec(f.get<1>()));
-          		}
-          		dynBody.ResetForces();
-        	}
+                for(list<DynamicBody::ForceAtPosition>::iterator it = dynBody.GetForces().begin(); it != dynBody.GetForces().end(); it++)
+                {
+                    DynamicBody::ForceAtPosition & f = *it;
+                    btBody.applyForce(toBtVec(f.get<0>()),toBtVec(f.get<1>()));
+                }
+                dynBody.ResetForces();
+            }
         }
 
-      	for(list< CarPair >::iterator it = cars.begin(); it != cars.end(); it++)
-	  	{
-			Car & oeCar = *(*it).get<0>();
-		  	btRaycastVehicle & btCar = *(*it).get<1>();
-			
-		  	CarConfig & config = oeCar.GetConfig();
-		  	const float turnPercent = (fabs(oeCar.GetTurn()) < 0.01 ? 0 : oeCar.GetTurn());
-        	const float forcePercent = oeCar.GetEngineForce();
-        	const float breakForcePercent = oeCar.GetBrake();
+        for(list< CarPair >::iterator it = cars.begin(); it != cars.end(); it++)
+        {
+            Car & oeCar = *(*it).get<0>();
+            btRaycastVehicle & btCar = *(*it).get<1>();
+            
+            CarConfig & config = oeCar.GetConfig();
+            const float turnPercent = (fabs(oeCar.GetTurn()) < 0.01 ? 0 : oeCar.GetTurn());
+            const float forcePercent = oeCar.GetEngineForce();
+            const float breakForcePercent = oeCar.GetBrake();
 
-        	if(oeCar.GetConfig().tankSteer)
-			{
-          		const float leftEngine = 
-            		(forcePercent * config.maxEngineForce) +
-            		(-turnPercent * config.maxSteerAngle * config.maxEngineForce);
-          		const float rightEngine = 
-            		(forcePercent * config.maxEngineForce)+
-            		( turnPercent * config.maxSteerAngle * config.maxEngineForce);
+            if(oeCar.GetConfig().tankSteer)
+            {
+                const float leftEngine = 
+                    (forcePercent * config.maxEngineForce) +
+                    (-turnPercent * config.maxSteerAngle * config.maxEngineForce);
+                const float rightEngine = 
+                    (forcePercent * config.maxEngineForce)+
+                    ( turnPercent * config.maxSteerAngle * config.maxEngineForce);
 
-          		for (int i=0; i<btCar.getNumWheels(); i++)
-				{
-            		btCar.applyEngineForce(( i%2==0 ? leftEngine : rightEngine),i);
-            		btCar.setBrake(breakForcePercent*config.maxBreakForce,i);
-          		}
-        	}
-        	else
-			{
-          		btCar.applyEngineForce(forcePercent * config.maxEngineForce,0);
-          		btCar.applyEngineForce(forcePercent * config.maxEngineForce,1);
-          		btCar.applyEngineForce(forcePercent * config.maxEngineForce,2);
-          		btCar.applyEngineForce(forcePercent * config.maxEngineForce,3);
+                for (int i=0; i<btCar.getNumWheels(); i++)
+                {
+                    btCar.applyEngineForce(( i%2==0 ? leftEngine : rightEngine),i);
+                    btCar.setBrake(breakForcePercent*config.maxBreakForce,i);
+                }
+            }
+            else
+            {
+                btCar.applyEngineForce(forcePercent * config.maxEngineForce,0);
+                btCar.applyEngineForce(forcePercent * config.maxEngineForce,1);
+                btCar.applyEngineForce(forcePercent * config.maxEngineForce,2);
+                btCar.applyEngineForce(forcePercent * config.maxEngineForce,3);
 
-          		const float breakingBalance = oeCar.GetConfig().GetBreakingBalance();
+                const float breakingBalance = oeCar.GetConfig().GetBreakingBalance();
 
-          		// Breaking on all four wheels causes jitter when standing still
-          		btCar.setBrake(breakForcePercent * config.maxBreakForce * breakingBalance,0);
-          		btCar.setBrake(breakForcePercent * config.maxBreakForce * breakingBalance,1);
-          		btCar.setBrake(breakForcePercent * config.maxBreakForce * (1-breakingBalance),2);
-          		btCar.setBrake(breakForcePercent * config.maxBreakForce * (1-breakingBalance),3);
-          		//logger.info << breakForcePercent << logger.end;
+                // Breaking on all four wheels causes jitter when standing still
+                btCar.setBrake(breakForcePercent * config.maxBreakForce * breakingBalance,0);
+                btCar.setBrake(breakForcePercent * config.maxBreakForce * breakingBalance,1);
+                btCar.setBrake(breakForcePercent * config.maxBreakForce * (1-breakingBalance),2);
+                btCar.setBrake(breakForcePercent * config.maxBreakForce * (1-breakingBalance),3);
+                //logger.info << breakForcePercent << logger.end;
 
-          		btCar.setSteeringValue(-1 * turnPercent * config.maxSteerAngle,0);
-          		btCar.setSteeringValue(-1 * turnPercent * config.maxSteerAngle,1);
-          		if(oeCar.GetConfig().allWheelSteer)
-				{
-            		btCar.setSteeringValue(turnPercent * config.maxSteerAngle,2);
-            		btCar.setSteeringValue(turnPercent * config.maxSteerAngle,3);
-          		}
-        	}
-        	//logger.info << turnPercent << logger.end;
-      	}
-      	
-		float sec = deltaTime/100000.0;
-      	sec = timer.GetElapsedTimeAndReset().AsInt()/100000.0;
-      	//logger.info << sec << logger.end;
+                btCar.setSteeringValue(-1 * turnPercent * config.maxSteerAngle,0);
+                btCar.setSteeringValue(-1 * turnPercent * config.maxSteerAngle,1);
+                if(oeCar.GetConfig().allWheelSteer)
+                {
+                    btCar.setSteeringValue(turnPercent * config.maxSteerAngle,2);
+                    btCar.setSteeringValue(turnPercent * config.maxSteerAngle,3);
+                }
+            }
+            //logger.info << turnPercent << logger.end;
+        }
+        
+        float sec = deltaTime/100000.0;
+        sec = timer.GetElapsedTimeAndReset().AsInt()/100000.0;
+        //logger.info << sec << logger.end;
 
-      	m_dynamicsWorld->stepSimulation(sec, 10);
+        m_dynamicsWorld->stepSimulation(sec, 10);
 
-      	for(list< BodyPair >::iterator it = bodies.begin(); it != bodies.end(); it++)
-	  	{
-        	IRigidBody & oeBody = *(*it).get<0>();
-        	btRigidBody & btBody = *(*it).get<1>();
+        for(list< BodyPair >::iterator it = bodies.begin(); it != bodies.end(); it++)
+        {
+            IRigidBody & oeBody = *(*it).get<0>();
+            btRigidBody & btBody = *(*it).get<1>();
 
-        	if(typeid(DynamicBody) == typeid(oeBody))
-			{
-          		DynamicBody & dynBody = *dynamic_cast<DynamicBody*>((*it).get<0>());
-          		dynBody.SetPosition(toOEVec(btBody.getCenterOfMassPosition()));
-          		dynBody.SetRotation(toOEQuat(btBody.getOrientation()));
-          		dynBody.SetAngularVelocity(toOEVec(btBody.getAngularVelocity()));
-          		dynBody.SetLinearVelocity(toOEVec(btBody.getLinearVelocity()));
-          		dynBody.SetStateChanged(false);
+            if(typeid(DynamicBody) == typeid(oeBody))
+            {
+                DynamicBody & dynBody = *dynamic_cast<DynamicBody*>((*it).get<0>());
+                dynBody.SetPosition(toOEVec(btBody.getCenterOfMassPosition()));
+                dynBody.SetRotation(toOEQuat(btBody.getOrientation()));
+                dynBody.SetAngularVelocity(toOEVec(btBody.getAngularVelocity()));
+                dynBody.SetLinearVelocity(toOEVec(btBody.getLinearVelocity()));
+                dynBody.SetStateChanged(false);
 
-          		// logger.info << toOEVec(btBody.getCenterOfMassPosition()) << logger.end;
-        	}  
-      	}
-      	for(list< CarPair >::iterator it = cars.begin(); it != cars.end(); it++) 
-	  	{
-        	Car & oeCar = *(*it).get<0>();
-        	DynamicBody * oeChassis = oeCar.GetChassis();
-        	btRaycastVehicle & btCar = *(*it).get<1>();
-        	btRigidBody * btChassis = btCar.getRigidBody();
+                // logger.info << toOEVec(btBody.getCenterOfMassPosition()) << logger.end;
+            }  
+        }
+        for(list< CarPair >::iterator it = cars.begin(); it != cars.end(); it++) 
+        {
+            Car & oeCar = *(*it).get<0>();
+            DynamicBody * oeChassis = oeCar.GetChassis();
+            btRaycastVehicle & btCar = *(*it).get<1>();
+            btRigidBody * btChassis = btCar.getRigidBody();
 
-        	oeChassis->SetPosition(toOEVec(btChassis->getCenterOfMassPosition()));
-        	oeChassis->SetRotation(toOEQuat(btChassis->getOrientation()));
-        	oeChassis->SetAngularVelocity(toOEVec(btChassis->getAngularVelocity()));
-        	oeChassis->SetLinearVelocity(toOEVec(btChassis->getLinearVelocity()));
-        	oeChassis->SetStateChanged(false);
+            oeChassis->SetPosition(toOEVec(btChassis->getCenterOfMassPosition()));
+            oeChassis->SetRotation(toOEQuat(btChassis->getOrientation()));
+            oeChassis->SetAngularVelocity(toOEVec(btChassis->getAngularVelocity()));
+            oeChassis->SetLinearVelocity(toOEVec(btChassis->getLinearVelocity()));
+            oeChassis->SetStateChanged(false);
 
-			// 	for (int i=0; i<btCar.getNumWheels(); i++ )
-			// 	{
-			// 		btCar.updateWheelTransform(i);
-			// 	}
-      	}
+            //  for (int i=0; i<btCar.getNumWheels(); i++ )
+            //  {
+            //      btCar.updateWheelTransform(i);
+            //  }
+        }
     }
     
 
@@ -278,7 +278,7 @@ namespace OpenEngine
         }
         Car * car = dynamic_cast<Car*>(body);
         DynamicBody * chassis = car->GetChassis();
-	btCollisionShape* chassisShape = ConvertShape(chassis->GetShape());
+    btCollisionShape* chassisShape = ConvertShape(chassis->GetShape());
         CarConfig & carConfig(car->GetConfig());
 
         // create rigid body
@@ -341,7 +341,7 @@ namespace OpenEngine
 
         //        logger.info << "numWheels" << vehicle->getNumWheels() << logger.end;
         
-		
+        
         for (int i=0;i<vehicle->getNumWheels();i++)
           {
             btWheelInfo& wheel = vehicle->getWheelInfo(i);
@@ -477,7 +477,7 @@ namespace OpenEngine
 
 
       m_dynamicsWorld->addRigidBody(body);
-	
+    
       return body;
     }
 
@@ -495,39 +495,39 @@ namespace OpenEngine
         return new btBoxShape(toBtVec(size));
       }
       else if(typeid(TriangleMesh) == typeid(*geom))
-	  {
+      {
         TriangleMesh* triangleMesh = dynamic_cast<TriangleMesh*>(geom);
-		btTriangleMesh* triMesh = new btTriangleMesh();
+        btTriangleMesh* triMesh = new btTriangleMesh();
 
-		for(unsigned int x=0; x<triangleMesh->GetSize(); x++)
-		{
-			//Get Iterator
-			TriangleIterator TI(triangleMesh->GetMesh(x));
-			
-			while(TI.isGood())
-			{
-				triMesh->addTriangle(toBtVec(TI.vec[0]), toBtVec(TI.vec[1]), toBtVec(TI.vec[2]));
-				TI.next();
-			}
-		}
-		//cout << "NumTriangles in triangleMesh: " << triMesh->getNumTriangles() << std::endl;
+        for(unsigned int x=0; x<triangleMesh->GetSize(); x++)
+        {
+            //Get Iterator
+            TriangleIterator TI(triangleMesh->GetMesh(x));
+            
+            while(TI.isGood())
+            {
+                triMesh->addTriangle(toBtVec(TI.vec[0]), toBtVec(TI.vec[1]), toBtVec(TI.vec[2]));
+                TI.next();
+            }
+        }
+        //cout << "NumTriangles in triangleMesh: " << triMesh->getNumTriangles() << std::endl;
         
-		#if OE_SAFE
+        #if OE_SAFE
         if(triMesh->getNumTriangles()==0)
-		    throw Exception("ERROR ADDED TRIANGLE MESH (PHYSICS)");
-		#endif
-		
-		  // make a new triangle mesh shape
+            throw Exception("ERROR ADDED TRIANGLE MESH (PHYSICS)");
+        #endif
+        
+          // make a new triangle mesh shape
         bool useQuantizedBvhTree = true;
         btCollisionShape* shape = NULL;
         shape = new btBvhTriangleMeshShape(triMesh, useQuantizedBvhTree);
         ((btBvhTriangleMeshShape*)shape)->recalcLocalAabb(); // do we need to do this?
         return shape;
-	}
+    }
       else if(typeid(CompoundShape) == typeid(*geom)) {
         CompoundShape * compound = dynamic_cast<CompoundShape*>(geom);
         btCompoundShape * cShape = new btCompoundShape();
-        for(int i = 0; i < compound->getNumChildShapes(); i++) {	  
+        for(int i = 0; i < compound->getNumChildShapes(); i++) {      
           OpenEngine::Geometry::GeometryBase * shape = compound->getChildShape(i);
           TransformationNode * tn = compound->getChildTransform(i);
           btCollisionShape * collShape = ConvertShape(shape);
@@ -579,7 +579,7 @@ namespace OpenEngine
         //delete[] arr; // Will it be copied? - I think not
 
         return bhts;
-	
+    
 
       }
       else {
