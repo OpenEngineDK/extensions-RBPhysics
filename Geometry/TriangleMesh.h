@@ -39,8 +39,6 @@ public:
 	}
 
 private:
-	FaceSet* faces;
-
 	Resources::IDataBlockPtr Vertices;
 	IndicesPtr Indices;
 
