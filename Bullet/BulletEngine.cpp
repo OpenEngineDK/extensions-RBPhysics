@@ -503,11 +503,10 @@ namespace OpenEngine
         {
             //Get Iterator
             TriangleIterator TI(triangleMesh->GetMesh(x));
-            
-            while(TI.isGood())
+
+            for(TI.first(); TI.isGood(); TI++)
             {
                 triMesh->addTriangle(toBtVec(TI.vec[0]), toBtVec(TI.vec[1]), toBtVec(TI.vec[2]));
-                TI.next();
             }
         }
         //cout << "NumTriangles in triangleMesh: " << triMesh->getNumTriangles() << std::endl;
