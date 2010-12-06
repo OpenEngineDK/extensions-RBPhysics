@@ -82,7 +82,7 @@ namespace OpenEngine
           /*
            * Helpers for AddRigidBody:
            */
-	  btCollisionShape* ConvertShape(OpenEngine::Geometry::GeometryBase * geom);
+	  btCollisionShape* ConvertShape(OpenEngine::Geometry::GeometryBase * geom, bool isDynamic = false);
 
           void CreateDynamicBody(OpenEngine::Physics::IRigidBody * body, 
                                  btCollisionShape * shape,

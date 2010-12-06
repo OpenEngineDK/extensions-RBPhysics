@@ -27,10 +27,12 @@ namespace OpenEngine {
       deactivation(false),
       stateChanged(true)
     {
+        /*
       if(typeid(TriangleMesh) == typeid(*this->body->GetShape()) ||
          typeid(HeightfieldTerrainShape) == typeid(*this->body->GetShape())) {
         throw InvalidArgument("dynamic concave bodies not supported");
       }
+      */
     }
 
     DynamicBody::~DynamicBody() {
