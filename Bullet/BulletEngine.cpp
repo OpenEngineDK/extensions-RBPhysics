@@ -10,6 +10,7 @@
 #include <Geometry/CompoundShape.h>
 #include <Geometry/HeightfieldTerrainShape.h>
 #include <Geometry/TriangleIterator.h>
+#include <Geometry/BoundingSphere.h>
 #include <Core/Exceptions.h>
 #include <Logging/Logger.h>
 #include <Physics/RigidBody.h>
@@ -493,9 +494,9 @@ namespace OpenEngine
 
         btCollisionShape * BulletEngine::ConvertShape(OpenEngine::Geometry::GeometryBase * geom, bool isDynamic)
         {
-            if(typeid(Sphere) == typeid(*geom))
+            if(typeid(BoundingSphere) == typeid(*geom))
             {
-                const Sphere & sphere = *dynamic_cast<const Sphere* >(geom);
+                Sphere sphere = ((BoundingSphere*)geom)->getSphere();
                 return new btSphereShape(sphere.GetRadius());
             }
             // case Box

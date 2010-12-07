@@ -1,19 +1,27 @@
 #ifndef _OE_BOUNDING_SPHERE_
 #define _OE_BOUNDING_SPHERE_
 
-// dummy class, to make RBPhysics compile again
+#include <Geometry/Sphere.h>
+#include <Geometry/Geometry.h>
 
 namespace OpenEngine {
 namespace Geometry {
 
-class BoundingSphere : public Geometry {
+class BoundingSphere : public GeometryBase
+{
     private:
         Sphere* sphere;
     public:
-        BoundingSphere(Vector<3,float> center, float diameter) {
-            sphere = new Sphere(center,diameter);
+        BoundingSphere(Vector<3,float> center, float diameter)
+        {
+            sphere = new Sphere(center, diameter);
         }
         virtual ~BoundingSphere() {}
+
+        Sphere getSphere()
+        {
+            return *sphere;
+        }
 };
 
 } // NS Geometry
