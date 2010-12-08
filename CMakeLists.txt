@@ -22,5 +22,5 @@ ADD_LIBRARY(Extensions_RBPhysics
 )
 
 TARGET_LINK_LIBRARIES( Extensions_RBPhysics
-${BULLET_LIBRARIES}
+    ${BULLET_LIBRARIES}
 )

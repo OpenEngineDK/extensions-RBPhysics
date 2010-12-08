@@ -6,12 +6,11 @@
 #  BULLET_LIBRARIES - Link these to use Collada DOM
 #
 
-STRING(COMPARE EQUAL ${CMAKE_BUILD_TYPE} "debug" ISDEBUGENABLED)
-
   SET(BULLETDYNAMICS "BulletDynamics")
   SET(BULLETCOLLISION "BulletCollision")
   SET(BULLETMATH "LinearMath")
-  SET(BULLETSOFTBODY "BulletSoftBody")  
+  SET(BULLETSOFTBODY "BulletSoftBody")
+  SET(BULLETMULTITHREADED "BulletMultiThreaded")
 
 FIND_PATH(BULLET_INCLUDE_DIR NAMES btBulletCollisionCommon.h btBulletCollisionCommon.h
   PATHS
@@ -42,7 +41,7 @@ FIND_LIBRARY(LIBBULLETDYNAMICS
 )
 
 IF(NOT LIBBULLETDYNAMICS)
-  MESSAGE ("WARNING: Could not find bullet dynamics - depending targets will be disabled.")
+    MESSAGE ("WARNING: Could not find Bullet Dynamics - depending targets will be disabled.")
 ENDIF(NOT LIBBULLETDYNAMICS)
 
 
@@ -63,7 +62,7 @@ FIND_LIBRARY(LIBBULLETCOLLISION
 )
 
 IF(NOT LIBBULLETCOLLISION)
-  MESSAGE ("WARNING: Could not find bullet collision - depending targets will be disabled.")
+    MESSAGE ("WARNING: Could not find Bullet Collision - depending targets will be disabled.")
 ENDIF(NOT LIBBULLETCOLLISION)
 
 FIND_LIBRARY(LIBBULLETMATH
@@ -83,7 +82,7 @@ FIND_LIBRARY(LIBBULLETMATH
 )
 
 IF(NOT LIBBULLETMATH)
-  MESSAGE ("WARNING: Could not find bullet math - depending targets will be disabled.")
+    MESSAGE ("WARNING: Could not find Bullet Math - depending targets will be disabled.")
 ENDIF(NOT LIBBULLETMATH)
 
 FIND_LIBRARY(LIBBULLETSOFTBODY
@@ -103,11 +102,31 @@ FIND_LIBRARY(LIBBULLETSOFTBODY
 )
 
 IF(NOT LIBBULLETSOFTBODY)
-  MESSAGE ("WARNING: Could not find bulletsoftbody - depending targets will be disabled.")
+    MESSAGE ("WARNING: Could not find Bullet SoftBody - depending targets will be disabled.")
 ENDIF(NOT LIBBULLETSOFTBODY)
 
 
-SET(BULLET_LIBRARIES ${LIBBULLETDYNAMICS} ${LIBBULLETCOLLISION} ${LIBBULLETMATH} ${LIBBULLETSOFTBODY})
+FIND_LIBRARY(LIBBULLETMULTITHREADED
+  NAMES 
+  ${BULLETMULTITHREADED}
+  PATHS
+  ${PROJECT_BINARY_DIR}/lib
+  ${PROJECT_SOURCE_DIR}/lib
+  ${PROJECT_SOURCE_DIR}/libraries
+  ${PROJECT_SOURCE_DIR}/libraries/bullet/lib
+  ENV LD_LIBRARY_PATH
+  ENV LIBRARY_PATH
+  /usr/lib
+  /usr/local/lib
+  /opt/local/lib
+  NO_DEFAULT_PATH
+)
+
+IF(NOT LIBBULLETMULTITHREADED)
+    MESSAGE ("WARNING: Could not find Bullet MultiThreaded - depending targets will be disabled.")
+ENDIF(NOT LIBBULLETMULTITHREADED)
+
+SET(BULLET_LIBRARIES ${LIBBULLETDYNAMICS} ${LIBBULLETCOLLISION} ${LIBBULLETMATH} ${LIBBULLETSOFTBODY} ${LIBBULLETMULTITHREADED})
 
 IF(BULLET_INCLUDE_DIR AND BULLET_LIBRARIES)
   SET(BULLET_FOUND TRUE)

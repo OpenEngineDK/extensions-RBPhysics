@@ -1,6 +1,8 @@
 #ifndef _BULLETENGINE_H
 #define _BULLETENGINE_H
 
+//#define BULLET_MULTITHREADED
+
 #include <Physics/IPhysEngine.h>
 #include <Math/Vector.h>
 #include <list>
@@ -18,11 +20,10 @@ class btCollisionDispatcher;
 class btConstraintSolver;
 class btCollisionAlgorithmCreateFunc;
 class btDefaultCollisionConfiguration;
-
+class btThreadSupportInterface;
 
 namespace OpenEngine 
 {
-
     namespace Geometry 
     {
         class AABB;
@@ -100,6 +101,11 @@ namespace OpenEngine
                 btConstraintSolver* m_solver;
                 btCollisionAlgorithmCreateFunc* m_boxBoxCF;
                 btDefaultCollisionConfiguration* m_collisionConfiguration;  
+
+                #ifdef BULLET_MULTITHREADED
+                    btThreadSupportInterface* m_threadSupportCollision;
+	                btThreadSupportInterface* m_threadSupportSolver;
+                #endif
 
                 static const float collisionMargin = 0.05f;
                 static const int maxProxies = 32766;

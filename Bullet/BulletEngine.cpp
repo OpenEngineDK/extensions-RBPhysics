@@ -1,3 +1,5 @@
+// TODO: Make windows use pthreads aswell
+
 #include <Bullet/BulletEngine.h>
 
 #include <Bullet/DebugDrawer.h>
@@ -23,6 +25,68 @@
 #include <btBulletDynamicsCommon.h>
 #include <Resources/DataBlock.h>
 
+// NOTE: USE_LIBSPE2 is PS3 SPU stuff
+#ifdef BULLET_MULTITHREADED
+    //Platform stuff
+    #define uint64_t IS_ALREADY_DEFINED
+    #include <BulletMultiThreaded/PlatformDefinitions.h>
+    #undef uint64_t // Dont fuck up everything
+    //Dispatcher
+    #include <BulletMultiThreaded/SpuGatheringCollisionDispatcher.h>
+    //Thread lib
+    #ifdef USE_LIBSPE2
+        #include <BulletMultiThreaded/SpuLibspe2Support.h>
+    #else
+        #if defined (_WIN32)
+            #include <BulletMultiThreaded/Win32ThreadSupport.h>
+        #elif defined (USE_PTHREADS)
+            #include <BulletMultiThreaded/PosixThreadSupport.h>
+        #endif //_WIN32 && USE_PTHREADS
+        #include <BulletMultiThreaded/SpuNarrowPhaseCollisionTask/SpuGatheringCollisionTask.h>
+    #endif //USE_LIBSPE2
+    //Solver
+    #include <BulletMultiThreaded/btParallelConstraintSolver.h>
+    #include <BulletMultiThreaded/SequentialThreadSupport.h>
+
+    btThreadSupportInterface* createSolverThreadSupport(int maxNumThreads)
+    {
+        //#define SEQUENTIAL
+        #ifdef SEQUENTIAL
+	        SequentialThreadSupport::SequentialThreadConstructionInfo tci(
+                    "solverThreads",
+                    SolverThreadFunc,
+                    SolverlsMemoryFunc);
+	        SequentialThreadSupport* threadSupport = new SequentialThreadSupport(tci);
+	        threadSupport->startSPU();
+        #else //SEQUENTIAL
+            #ifdef _WIN32
+	            Win32ThreadSupport::Win32ThreadConstructionInfo threadConstructionInfo(
+                        "solverThreads",
+                        SolverThreadFunc,
+                        SolverlsMemoryFunc,
+                        maxNumThreads);
+	            Win32ThreadSupport* threadSupport = new Win32ThreadSupport(threadConstructionInfo);
+	            threadSupport->startSPU();
+            #elif defined (USE_PTHREADS) //_WIN32
+	            PosixThreadSupport::ThreadConstructionInfo solverConstructionInfo(
+                        "solver",
+                        SolverThreadFunc,
+                        SolverlsMemoryFunc,
+                        maxNumThreads);
+	            PosixThreadSupport* threadSupport = new PosixThreadSupport(solverConstructionInfo);
+            #else //_WIN32 && USE_PTHREADS
+	            SequentialThreadSupport::SequentialThreadConstructionInfo tci(
+                        "solverThreads",
+                        SolverThreadFunc,
+                        SolverlsMemoryFunc);
+	            SequentialThreadSupport* threadSupport = new SequentialThreadSupport(tci);
+	            threadSupport->startSPU();
+            #endif //_WIN32 && USE_PTHREADS
+        #endif // SEQUENTIAL
+	    return threadSupport;
+    }
+#endif
+
 using OpenEngine::Core::NotImplemented;
 using namespace OpenEngine::Physics;
 using namespace OpenEngine::Geometry;
@@ -37,33 +101,102 @@ namespace OpenEngine
 
         BulletEngine::BulletEngine(OpenEngine::Geometry::AABB & worldAabb, Vector<3,float> gravity) 
         {
+            #ifdef BULLET_MULTITHREADED
+	            m_threadSupportSolver = 0;
+	            m_threadSupportCollision = 0;
+                int maxNumOutstandingTasks = 8;
+            #endif
+            m_dispatcher=0;
             m_collisionConfiguration = new btDefaultCollisionConfiguration();
 
-            m_dispatcher = new btCollisionDispatcher(m_collisionConfiguration);
-
+            #ifdef BULLET_MULTITHREADED
+                #ifdef USE_WIN32_THREADING
+                    m_threadSupportCollision = new Win32ThreadSupport(
+                            Win32ThreadSupport::Win32ThreadConstructionInfo(
+                                "collision",
+                                processCollisionTask,
+                                createCollisionLocalStoreMemory,
+                                maxNumOutstandingTasks));
+                #else //USE_WIN32_THREADING
+                    #ifdef USE_LIBSPE2
+                        spe_program_handle_t *program_handle;
+                        #ifndef USE_CESOF
+                            program_handle = spe_image_open("./spuCollision.elf");
+                            if (program_handle == NULL)
+                                logger.error << "SPU OPEN IMAGE ERROR" << logger.end;
+                            else
+                                logger.info << "IMAGE OPENED" << logger.end;
+                        #else //USE_CESOF
+                            extern spe_program_handle_t spu_program;
+                            program_handle = &spu_program;
+                        #endif //USE_CESOF
+                    SpuLibspe2Support* threadSupportCollision = 
+                        new SpuLibspe2Support(program_handle, maxNumOutstandingTasks);
+                    #elif defined (USE_PTHREADS) //USE_LIBSPE2
+                        PosixThreadSupport::ThreadConstructionInfo constructionInfo(
+                                "collision",
+                                processCollisionTask,
+                                createCollisionLocalStoreMemory,
+                                maxNumOutstandingTasks);
+                        m_threadSupportCollision = new PosixThreadSupport(constructionInfo);
+                    #else //USE_LIBSPE2 && USE_PTHREADS
+                        SequentialThreadSupport::SequentialThreadConstructionInfo colCI(
+                                "collision",
+                                processCollisionTask,
+                                createCollisionLocalStoreMemory);
+	                    SequentialThreadSupport* m_threadSupportCollision = new SequentialThreadSupport(colCI);
+                    #endif //USE_LIBSPE2 && USE_PTHREADS
+                #endif //USE_WIN32_THREADING
+                m_dispatcher = new SpuGatheringCollisionDispatcher(
+                        m_threadSupportCollision,
+                        maxNumOutstandingTasks,
+                        m_collisionConfiguration);
+            #else //BULLET_MULTITHREADED
+                m_dispatcher = new btCollisionDispatcher(m_collisionConfiguration);
+            #endif //BULLET_MULTITHREADED
+            
             btVector3 worldAabbMin = toBtVec(worldAabb.GetCorner(0,0,0));
             btVector3 worldAabbMax = toBtVec(worldAabb.GetCorner(1,1,1));
 
             m_broadphase = new btAxisSweep3(worldAabbMin,worldAabbMax,maxProxies);
 
-            m_solver = new btSequentialImpulseConstraintSolver();
+            #ifdef BULLET_MULTITHREADED
+                m_threadSupportSolver = createSolverThreadSupport(maxNumOutstandingTasks);
+	            m_solver = new btParallelConstraintSolver(m_threadSupportSolver);
+            #else //BULLET_MULTITHREADED
+                m_solver = new btSequentialImpulseConstraintSolver();
+            #endif //BULLET_MULTITHREADED
 
-            btDiscreteDynamicsWorld* world =
-                new btDiscreteDynamicsWorld(m_dispatcher,
-                        m_broadphase,
-                        m_solver,
-                        m_collisionConfiguration);
+            btDiscreteDynamicsWorld* world = new btDiscreteDynamicsWorld(
+                    m_dispatcher,
+                    m_broadphase,
+                    m_solver,
+                    m_collisionConfiguration);
             m_dynamicsWorld = world;
 
+            #ifdef BULLET_MULTITHREADED
+                //world->getSimulationIslandManager()->setSplitIslands(false);
+		        world->getSolverInfo().m_numIterations = 4;
+		        world->getSolverInfo().m_solverMode = SOLVER_SIMD+SOLVER_USE_WARMSTARTING;//+SOLVER_RANDMIZE_ORDER;
+                m_dynamicsWorld->getDispatchInfo().m_enableSPU = true;
+            #endif //BULLET_MULTITHREADED 
             m_dynamicsWorld->setGravity(toBtVec(gravity));
             timer.Start();
         }
 
-        BulletEngine::~BulletEngine() {
+        BulletEngine::~BulletEngine()
+        {
+            #ifdef BULLET_MULTITHREADED
+            	if (m_threadSupportSolver)
+		            delete m_threadSupportSolver;
+                if (m_threadSupportCollision)
+		            delete m_threadSupportCollision;
+            #endif //BULLET_MULTITHREADED 
             delete m_dispatcher;
             delete m_broadphase;
             delete m_solver;
             delete m_dynamicsWorld;
+            delete m_collisionConfiguration;
         }
 
         void BulletEngine::Initialize(){}
