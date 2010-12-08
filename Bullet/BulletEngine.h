@@ -23,88 +23,88 @@ class btDefaultCollisionConfiguration;
 namespace OpenEngine 
 {
 
-  namespace Geometry 
+    namespace Geometry 
     {
-      class AABB;
+        class AABB;
     }
 
-  namespace Physics 
+    namespace Physics 
     {
-      class IRayResultCallback;
-      class Car;
+        class IRayResultCallback;
+        class Car;
     }
 
-  namespace Bullet
+    namespace Bullet
     {
 
-      class BulletEngine : public Physics::IPhysEngine 
-	{
+        class BulletEngine : public Physics::IPhysEngine 
+        {
 
-	public:
-          BulletEngine(OpenEngine::Geometry::AABB & worldAabb, OpenEngine::Math::Vector<3,float> gravity);
-          ~BulletEngine();
+            public:
+                BulletEngine(OpenEngine::Geometry::AABB & worldAabb, OpenEngine::Math::Vector<3,float> gravity);
+                ~BulletEngine();
 
-          void Initialize();
-  
-          void Process(const float deltaTime);
-  
-          void Deinitialize();
+                void Initialize();
 
-	  void ClientResetScene(btRigidBody * chassis);
-         
-          void AddRigidBody(OpenEngine::Physics::IRigidBody * body);
+                void Process(const float deltaTime);
 
-          void RemoveRigidBody(OpenEngine::Physics::IRigidBody * body);
+                void Deinitialize();
 
-          OpenEngine::Physics::IRigidBody * LookUp(btRigidBody * body);
-          btRigidBody * LookUp(OpenEngine::Physics::IRigidBody * body);
+                void ClientResetScene(btRigidBody * chassis);
 
-          void RayTest(const OpenEngine::Math::Vector<3,float> & begin,
-                       const OpenEngine::Math::Vector<3,float> & end,
-                       OpenEngine::Physics::IRayResultCallback * callback);
+                void AddRigidBody(OpenEngine::Physics::IRigidBody * body);
 
-          OpenEngine::Scene::RenderNode *
-	    getRenderNode(OpenEngine::Renderers::IRenderer * renderer);
+                void RemoveRigidBody(OpenEngine::Physics::IRigidBody * body);
 
-          typedef boost::tuple<OpenEngine::Physics::IRigidBody*,btRigidBody*> BodyPair;
-          typedef boost::tuple<OpenEngine::Physics::Car*,btRaycastVehicle*> CarPair;
+                OpenEngine::Physics::IRigidBody * LookUp(btRigidBody * body);
+                btRigidBody * LookUp(OpenEngine::Physics::IRigidBody * body);
 
-        private:
+                void RayTest(const OpenEngine::Math::Vector<3,float> & begin,
+                        const OpenEngine::Math::Vector<3,float> & end,
+                        OpenEngine::Physics::IRayResultCallback * callback);
 
-          std::list< BodyPair > bodies;
-          std::list< CarPair > cars;
-        Utils::Timer timer;
-  
-          btRigidBody* localCreateRigidBody(float mass,
-					    const btTransform& startTransform,
-					    btCollisionShape* shape);
+                OpenEngine::Scene::RenderNode *
+                    getRenderNode(OpenEngine::Renderers::IRenderer * renderer);
 
-          /*
-           * Helpers for AddRigidBody:
-           */
-	  btCollisionShape* ConvertShape(OpenEngine::Geometry::GeometryBase * geom, bool isDynamic = false);
+                typedef boost::tuple<OpenEngine::Physics::IRigidBody*,btRigidBody*> BodyPair;
+                typedef boost::tuple<OpenEngine::Physics::Car*,btRaycastVehicle*> CarPair;
 
-          void CreateDynamicBody(OpenEngine::Physics::IRigidBody * body, 
-                                 btCollisionShape * shape,
-                                 btTransform trans);
- 
-          void CreateStaticBody(OpenEngine::Physics::IRigidBody * body, 
-                                btCollisionShape * shape,
-                                btTransform trans);
+            private:
+
+                std::list< BodyPair > bodies;
+                std::list< CarPair > cars;
+                Utils::Timer timer;
+
+                btRigidBody* localCreateRigidBody(float mass,
+                        const btTransform& startTransform,
+                        btCollisionShape* shape);
+
+                /*
+                 * Helpers for AddRigidBody:
+                 */
+                btCollisionShape* ConvertShape(OpenEngine::Geometry::GeometryBase * geom, bool isDynamic = false);
+
+                void CreateDynamicBody(OpenEngine::Physics::IRigidBody * body, 
+                        btCollisionShape * shape,
+                        btTransform trans);
+
+                void CreateStaticBody(OpenEngine::Physics::IRigidBody * body, 
+                        btCollisionShape * shape,
+                        btTransform trans);
 
 
-          ///this is the most important class
-          btDynamicsWorld*    m_dynamicsWorld;
-          btBroadphaseInterface* m_broadphase;  
-          btCollisionDispatcher* m_dispatcher;
-          btConstraintSolver* m_solver;
-          btCollisionAlgorithmCreateFunc* m_boxBoxCF;
-          btDefaultCollisionConfiguration* m_collisionConfiguration;  
+                ///this is the most important class
+                btDynamicsWorld*    m_dynamicsWorld;
+                btBroadphaseInterface* m_broadphase;  
+                btCollisionDispatcher* m_dispatcher;
+                btConstraintSolver* m_solver;
+                btCollisionAlgorithmCreateFunc* m_boxBoxCF;
+                btDefaultCollisionConfiguration* m_collisionConfiguration;  
 
-          static const float collisionMargin = 0.05f;
-          static const int maxProxies = 32766;
-          static const int maxOverlap = 65535;  
-          static const int maxNumObjects = 32760;
+                static const float collisionMargin = 0.05f;
+                static const int maxProxies = 32766;
+                static const int maxOverlap = 65535;  
+                static const int maxNumObjects = 32760;
         };
     }
 }

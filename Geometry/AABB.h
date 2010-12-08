@@ -16,15 +16,12 @@
 #include <Scene/ISceneNode.h>
 #include <Scene/GeometryNode.h>
 #include <string>
-#include <vector>
 
 namespace OpenEngine {
 namespace Geometry {
 
 using OpenEngine::Math::Vector;
 using namespace OpenEngine::Scene;
-using std::vector;
-
 
 /**
  * Bounding geometry box.
