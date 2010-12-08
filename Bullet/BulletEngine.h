@@ -1,7 +1,10 @@
+// TODO: Make windows use pthreads aswell
+// TODO: Get rid og tuple (boost)
+
 #ifndef _BULLETENGINE_H
 #define _BULLETENGINE_H
 
-//#define BULLET_MULTITHREADED
+#define BULLET_MULTITHREADED
 
 #include <Physics/IPhysEngine.h>
 #include <Math/Vector.h>
@@ -10,6 +13,7 @@
 #include <boost/tuple/tuple.hpp>
 #include <Utils/Timer.h>
 
+// Bullet definitions
 class btRigidBody;
 class btRaycastVehicle;
 class btTransform;
@@ -28,37 +32,32 @@ namespace OpenEngine
     {
         class AABB;
     }
-
     namespace Physics 
     {
         class IRayResultCallback;
         class Car;
     }
-
     namespace Bullet
     {
-
         class BulletEngine : public Physics::IPhysEngine 
         {
-
             public:
-                BulletEngine(OpenEngine::Geometry::AABB & worldAabb, OpenEngine::Math::Vector<3,float> gravity);
+                BulletEngine(OpenEngine::Geometry::AABB & worldAabb,
+                             OpenEngine::Math::Vector<3,float> gravity);
                 ~BulletEngine();
 
+                //Events
                 void Initialize();
-
                 void Process(const float deltaTime);
-
                 void Deinitialize();
 
                 void ClientResetScene(btRigidBody * chassis);
 
                 void AddRigidBody(OpenEngine::Physics::IRigidBody * body);
-
                 void RemoveRigidBody(OpenEngine::Physics::IRigidBody * body);
 
-                OpenEngine::Physics::IRigidBody * LookUp(btRigidBody * body);
-                btRigidBody * LookUp(OpenEngine::Physics::IRigidBody * body);
+                OpenEngine::Physics::IRigidBody *LookUp(btRigidBody * body);
+                btRigidBody *LookUp(OpenEngine::Physics::IRigidBody * body);
 
                 void RayTest(const OpenEngine::Math::Vector<3,float> & begin,
                         const OpenEngine::Math::Vector<3,float> & end,
@@ -114,6 +113,4 @@ namespace OpenEngine
         };
     }
 }
-
-
 #endif

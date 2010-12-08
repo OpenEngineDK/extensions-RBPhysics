@@ -1,5 +1,3 @@
-// TODO: Make windows use pthreads aswell
-
 #include <Bullet/BulletEngine.h>
 
 #include <Bullet/DebugDrawer.h>
