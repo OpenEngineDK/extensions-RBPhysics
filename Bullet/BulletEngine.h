@@ -1,5 +1,8 @@
-// TODO: Make windows use pthreads aswell
-// TODO: Get rid og tuple (boost)
+/* @todo:
+     *   Make windows use pthreads aswell
+     *   Get rid og tuple (boost) 
+     *   Make it able to link, with Bullet_MultiThreaded
+*/
 
 #ifndef _BULLETENGINE_H
 #define _BULLETENGINE_H

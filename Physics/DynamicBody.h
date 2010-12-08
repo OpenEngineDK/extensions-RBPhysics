@@ -1,5 +1,5 @@
 // Dynamic bodies (non static)
-// \todo{Implement activate (http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?t=6092)}
+//! @todo: Implement activate (http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?t=6092)
 
 #ifndef _PHYSICS_DYNAMICBODY_H
 #define _PHYSICS_DYNAMICBODY_H 1
