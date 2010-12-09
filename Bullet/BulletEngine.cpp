@@ -48,14 +48,14 @@
 
     btThreadSupportInterface* createSolverThreadSupport(int maxNumThreads)
     {
+        btThreadSupportInterface* threadSupport;
         //#define SEQUENTIAL
         #ifdef SEQUENTIAL
 	        SequentialThreadSupport::SequentialThreadConstructionInfo tci(
                     "solverThreads",
                     SolverThreadFunc,
                     SolverlsMemoryFunc);
-	        SequentialThreadSupport* threadSupport = new SequentialThreadSupport(tci);
-	        threadSupport->startSPU();
+	        threadSupport = new SequentialThreadSupport(tci);
         #else //SEQUENTIAL
             #ifdef _WIN32
 	            Win32ThreadSupport::Win32ThreadConstructionInfo threadConstructionInfo(
@@ -63,24 +63,23 @@
                         SolverThreadFunc,
                         SolverlsMemoryFunc,
                         maxNumThreads);
-	            Win32ThreadSupport* threadSupport = new Win32ThreadSupport(threadConstructionInfo);
-	            threadSupport->startSPU();
+	            threadSupport = new Win32ThreadSupport(threadConstructionInfo);
             #elif defined (USE_PTHREADS) //_WIN32
 	            PosixThreadSupport::ThreadConstructionInfo solverConstructionInfo(
                         "solver",
                         SolverThreadFunc,
                         SolverlsMemoryFunc,
                         maxNumThreads);
-	            PosixThreadSupport* threadSupport = new PosixThreadSupport(solverConstructionInfo);
+	            threadSupport = new PosixThreadSupport(solverConstructionInfo);
             #else //_WIN32 && USE_PTHREADS
 	            SequentialThreadSupport::SequentialThreadConstructionInfo tci(
                         "solverThreads",
                         SolverThreadFunc,
                         SolverlsMemoryFunc);
-	            SequentialThreadSupport* threadSupport = new SequentialThreadSupport(tci);
-	            threadSupport->startSPU();
+	            threadSupport = new SequentialThreadSupport(tci);
             #endif //_WIN32 && USE_PTHREADS
         #endif // SEQUENTIAL
+        threadSupport->startSPU();
 	    return threadSupport;
     }
 #endif
