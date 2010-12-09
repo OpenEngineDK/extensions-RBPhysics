@@ -80,7 +80,7 @@ namespace OpenEngine {
         {
 #if OE_SAFE
             if(!deactivation) //not disabled deact
-                logger.info << "Applying force, without deactivation!" << logger.end;
+                logger.warning << "Applying force, without deactivation!" << logger.end;
 #endif
             forces.push_back(ForceAtPosition(force,position));
         }
@@ -89,7 +89,7 @@ namespace OpenEngine {
         {
 #if OE_SAFE
             if(!deactivation) //not disabled deact
-                logger.info << "Applying force, without deactivation!" << logger.end;
+                logger.warning << "Applying force, without deactivation!" << logger.end;
 #endif
             forces.push_back(ForceAtPosition(force,Vector<3,float>(0,0,0)));
         }

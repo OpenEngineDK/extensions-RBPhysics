@@ -654,7 +654,7 @@ namespace OpenEngine
 
                 #if OE_SAFE
                 if(triMesh->getNumTriangles()==0)
-                    throw Exception("ERROR ADDED TRIANGLE MESH (PHYSICS)");
+                    throw Exception("ERROR ADDING TRIANGLE MESH (PHYSICS)");
                 #endif
 
                 if(isDynamic)
