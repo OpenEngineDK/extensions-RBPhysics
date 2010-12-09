@@ -164,17 +164,16 @@ namespace OpenEngine
                 m_solver = new btSequentialImpulseConstraintSolver();
             #endif //BULLET_MULTITHREADED
 
-            btDiscreteDynamicsWorld* world = new btDiscreteDynamicsWorld(
+            m_dynamicsWorld = new btDiscreteDynamicsWorld(
                     m_dispatcher,
                     m_broadphase,
                     m_solver,
                     m_collisionConfiguration);
-            m_dynamicsWorld = world;
 
             #ifdef BULLET_MULTITHREADED
-                //world->getSimulationIslandManager()->setSplitIslands(false);
-		        world->getSolverInfo().m_numIterations = 4;
-		        world->getSolverInfo().m_solverMode = SOLVER_SIMD+SOLVER_USE_WARMSTARTING;//+SOLVER_RANDMIZE_ORDER;
+                //m_dynamicsWorld->getSimulationIslandManager()->setSplitIslands(false);
+		        m_dynamicsWorld->getSolverInfo().m_numIterations = 4;
+		        m_dynamicsWorld->getSolverInfo().m_solverMode = SOLVER_SIMD+SOLVER_USE_WARMSTARTING;//+SOLVER_RANDMIZE_ORDER;
                 m_dynamicsWorld->getDispatchInfo().m_enableSPU = true;
             #endif //BULLET_MULTITHREADED 
             m_dynamicsWorld->setGravity(toBtVec(gravity));
