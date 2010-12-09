@@ -1,13 +1,13 @@
 /* @todo:
      *   Make windows use pthreads aswell
      *   Get rid og tuple (boost) 
-     *   Make it able to link, with Bullet_MultiThreaded
+     *   Currently Crashes with Bullet_MultiThreaded
 */
 
 #ifndef _BULLETENGINE_H
 #define _BULLETENGINE_H
 
-#define BULLET_MULTITHREADED
+//#define BULLET_MULTITHREADED
 
 #include <Physics/IPhysEngine.h>
 #include <Math/Vector.h>
