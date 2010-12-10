@@ -2,8 +2,9 @@
      *   Make windows use pthreads aswell
      *   Get rid og tuple (boost) 
      *   Currently Crashes with Bullet_MultiThreaded
-     *   Make an async define
+     *   Make an async define (once defined, run bullet async, using the event system)
      *   Convec vs. Concave (http://bulletphysics.org/Bullet/phpBB3/viewtopic.php?t=4368)
+     *   Fix Car physics
 */
 
 #ifndef _BULLETENGINE_H
