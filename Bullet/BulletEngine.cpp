@@ -24,7 +24,12 @@
 #include <Resources/DataBlock.h>
 
 //Compile with bullet with '#undef _WIN32' for pthreads support
-#undef _WIN32
+//Disable _WIN32 for Bullet
+#ifdef _WIN32
+    #define _WIN32_RESTORE
+    #undef _WIN32
+#endif //_WIN32
+
 #ifdef BULLET_MULTITHREADED
     //Platform stuff
     #include <BulletMultiThreaded/PlatformDefinitions.h>
@@ -668,4 +673,9 @@ namespace OpenEngine
         }
     }
 }
-#define _WIN32
+
+// Restore WIN32 if needed
+#ifdef _WIN32_RESTORE
+    #define _WIN32
+    #undef _WIN32_RESTORE
+#endif //_WIN32_RESTORE
