@@ -16,7 +16,10 @@ class BoundingSphere : public GeometryBase
         {
             sphere = new Sphere(center, diameter);
         }
-        virtual ~BoundingSphere() {}
+        virtual ~BoundingSphere()
+        {
+            delete sphere;
+        }
 
         Sphere getSphere()
         {
