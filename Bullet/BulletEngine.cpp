@@ -173,9 +173,8 @@ namespace OpenEngine
                     m_collisionConfiguration);
 
             #ifdef BULLET_MULTITHREADED
-                //m_dynamicsWorld->getSimulationIslandManager()->setSplitIslands(false);
-		        m_dynamicsWorld->getSolverInfo().m_numIterations = 4;
-		        m_dynamicsWorld->getSolverInfo().m_solverMode = SOLVER_SIMD+SOLVER_USE_WARMSTARTING;//+SOLVER_RANDMIZE_ORDER;
+		        m_dynamicsWorld->getSolverInfo().m_numIterations = 1;
+		        m_dynamicsWorld->getSolverInfo().m_solverMode = SOLVER_SIMD | SOLVER_USE_WARMSTARTING | SOLVER_CACHE_FRIENDLY;// | SOLVER_RANDMIZE_ORDER;
                 m_dynamicsWorld->getDispatchInfo().m_enableSPU = true;
             #endif //BULLET_MULTITHREADED 
             m_dynamicsWorld->setGravity(toBtVec(gravity));
