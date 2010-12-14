@@ -2,7 +2,7 @@
 #define PHYSICS_BULLET_DEBUG_NODE
 
 #include <Scene/RenderNode.h>
-#include <Renderers/IRenderingView.h>
+#include <Scene/ISceneNodeVisitor.h>
 #include <btBulletDynamicsCommon.h>
 #include <iostream>
 
@@ -22,12 +22,9 @@ class BulletDebugNode : public OpenEngine::Scene::RenderNode
 
   btDynamicsWorld* m_dynamicsWorld;
 
-  void Apply(OpenEngine::Renderers::IRenderingView* view) 
+  void Apply(Renderers::RenderingEventArg arg, OpenEngine::Scene::ISceneNodeVisitor& v) 
   {
-    using namespace std;
-
-
-    m_dynamicsWorld->debugDrawWorld();
+        m_dynamicsWorld->debugDrawWorld();
     //    btVector3 pos = m_ballBody->getCenterOfMassPosition();
     //    cout << "(" << pos[0] << "," << pos[1] << "," << pos[2] << ")" <<  endl;
 /*     m_camera->SetPosition(Vector<3,float>(pos[0],pos[1],pos[2]+50)); */

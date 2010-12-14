@@ -58,19 +58,19 @@
 	        threadSupport = new SequentialThreadSupport(tci);
         #else //SEQUENTIAL
             #ifdef _WIN32
-	            Win32ThreadSupport::Win32ThreadConstructionInfo threadConstructionInfo(
+	            Win32ThreadSupport::Win32ThreadConstructionInfo tci(
                         "solverThreads",
                         SolverThreadFunc,
                         SolverlsMemoryFunc,
                         maxNumThreads);
-	            threadSupport = new Win32ThreadSupport(threadConstructionInfo);
+	            threadSupport = new Win32ThreadSupport(tci);
             #elif defined (USE_PTHREADS) //_WIN32
-	            PosixThreadSupport::ThreadConstructionInfo solverConstructionInfo(
+	            PosixThreadSupport::ThreadConstructionInfo tci(
                         "solver",
                         SolverThreadFunc,
                         SolverlsMemoryFunc,
                         maxNumThreads);
-	            threadSupport = new PosixThreadSupport(solverConstructionInfo);
+	            threadSupport = new PosixThreadSupport(tci);
             #else //_WIN32 && USE_PTHREADS
 	            SequentialThreadSupport::SequentialThreadConstructionInfo tci(
                         "solverThreads",
