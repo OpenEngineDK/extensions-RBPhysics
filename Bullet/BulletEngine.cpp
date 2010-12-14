@@ -156,13 +156,15 @@ namespace OpenEngine
             btVector3 worldAabbMax = toBtVec(worldAabb.GetCorner(1,1,1));
 
             m_broadphase = new btAxisSweep3(worldAabbMin,worldAabbMax,maxProxies);
-
+            //! @TODO: Make the MultiThreaded Solver work!
+            /*
             #ifdef BULLET_MULTITHREADED
                 m_threadSupportSolver = createSolverThreadSupport(maxNumOutstandingTasks);
 	            m_solver = new btParallelConstraintSolver(m_threadSupportSolver);
             #else //BULLET_MULTITHREADED
+            */
                 m_solver = new btSequentialImpulseConstraintSolver();
-            #endif //BULLET_MULTITHREADED
+            //#endif //BULLET_MULTITHREADED
 
             m_dynamicsWorld = new btDiscreteDynamicsWorld(
                     m_dispatcher,
