@@ -10,7 +10,7 @@
 #ifndef _BULLETENGINE_H
 #define _BULLETENGINE_H
 
-#define BULLET_MULTITHREADED
+//#define BULLET_MULTITHREADED
 
 #include <Physics/IPhysEngine.h>
 #include <Math/Vector.h>
