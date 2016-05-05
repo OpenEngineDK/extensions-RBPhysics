@@ -1,8 +1,8 @@
-dist /dependencies/BulletDep/BulletDep.dist http://openengine.dk/code/dependencies/BulletDep/BulletDep.dist
+dist /dependencies/BulletDep/BulletDep.dist https://raw.githubusercontent.com/OpenEngineDK/dependencies-BulletDep/master/BulletDep.dist
 
 # Pull self
-darcs /extensions/RBPhysics              http://openengine.dk/code/extensions/RBPhysics
-darcs-dev /extensions/RBPhysics          fh.daimi.au.dk:/users/cgd/code/extensions/RBPhysics
+git /extensions/RBPhysics              https://github.com/OpenEngineDK/extensions-RBPhysics.git
+git-dev /extensions/RBPhysics          git@github.com:OpenEngineDK/extensions-RBPhysics.git
 
 # get win lib
 win32 /libraries http://openengine.dk/data/libraries/bullet-win32.zip
